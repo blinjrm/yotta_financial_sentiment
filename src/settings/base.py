@@ -44,3 +44,6 @@ HEADLINE_COL = "headline"
 SENTIMENT_COL = "sentiment"
 MODEL_NAME = "distilroberta-base"
 SAVED_MODEL_FILE = os.path.join(MODEL_DIR, "model.pkl")
+
+ID2LABEL = {"0": "neutral", "1": "positive", "2": "negative"}
+LABEL2ID = {"neutral": 0, "positive": 1, "negative": 2}

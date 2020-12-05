@@ -98,7 +98,6 @@ def train_model(
     path=stg.TRAINING_DATA_DIR,
     headline_col=stg.HEADLINE_COL,
     sentiment_col=stg.SENTIMENT_COL,
-    model_name=stg.MODEL_NAME,
     epochs=5,
 ):
     """Create a model based on model_name and fine-tunes it with the data from filename
@@ -114,7 +113,7 @@ def train_model(
 
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
 
-    logging.info("_" * 20)
+    logging.info("40" * 20)
     logging.info("_________ Launch new training ___________\n")
 
     logging.info("Loading data..")
@@ -123,9 +122,11 @@ def train_model(
     X = df[headline_col].astype(str).tolist()
     y = df[sentiment_col].map({"neutral": 0, "positive": 1, "negative": 2}).tolist()
 
-    config = AutoConfig.from_pretrained(model_name, num_labels=3)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    config = AutoConfig.from_pretrained(
+        stg.MODEL_NAME, num_labels=3, id2label=stg.ID2LABEL, label2id=stg.LABEL2ID
+    )
+    model = AutoModelForSequenceClassification.from_pretrained(stg.MODEL_NAME, config=config)
+    tokenizer = AutoTokenizer.from_pretrained(stg.MODEL_NAME)
 
     train_dataset, test_dataset = create_dataset(X, y, tokenizer)
 
@@ -152,8 +153,9 @@ def train_model(
     trainer.evaluate()
 
     logging.info("Exporting model..")
-    trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier_{model_name}"))
-    tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer_{model_name}"))
+    trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier_{stg.MODEL_NAME}"))
+    tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer_{stg.MODEL_NAME}"))
+    config.save_pretrained(os.path.join(stg.MODEL_DIR, f"config_{stg.MODEL_NAME}"))
 
 
 if __name__ == "__main__":
