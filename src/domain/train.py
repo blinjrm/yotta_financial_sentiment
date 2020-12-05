@@ -14,7 +14,6 @@ Script could be run with the following command line from a python interpreter :
 
 """
 
-import argparse
 import logging
 import os
 
@@ -153,8 +152,8 @@ def train_model(
     trainer.evaluate()
 
     logging.info("Exporting model..")
-    trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier{model_name}"))
-    tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer{model_name}"))
+    trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier_{model_name}"))
+    tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer_{model_name}"))
 
 
 if __name__ == "__main__":
