@@ -1,6 +1,5 @@
 """
 Contains all configurations for the project.
-Should NOT contain any secrets.
 
 >>> import src.settings as stg
 
@@ -9,7 +8,6 @@ Should NOT contain any secrets.
 import logging
 import os
 
-# THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 TRAINING_DATA_DIR = os.path.join(REPO_DIR, "data/training/")
 PREDICTION_DATA_DIR = os.path.join(REPO_DIR, "data/prediction/")

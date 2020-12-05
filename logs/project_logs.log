@@ -131,3 +131,16 @@
 [2020-12-05 15:37:12][INFO][make_dataset] - .. Done 
 
 [2020-12-05 15:37:18][INFO][train] - Training model..
+
+
+[2020-12-05 16:46:15][INFO][train] - ____________________
+[2020-12-05 16:46:15][INFO][train] - _________ Launch new training ___________
+
+[2020-12-05 16:46:15][INFO][train] - Loading data..
+[2020-12-05 16:46:15][INFO][make_dataset] - Confirm file extension is .csv ..
+[2020-12-05 16:46:15][INFO][make_dataset] - .. Done 
+
+[2020-12-05 16:46:15][INFO][make_dataset] - Load data ..
+[2020-12-05 16:46:15][INFO][make_dataset] - .. Done 
+
+[2020-12-05 16:46:22][INFO][train] - Training model..

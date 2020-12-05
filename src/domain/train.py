@@ -4,20 +4,19 @@ Example
 -------
 Script could be run with the following command line from the shell :
 
-    $ python src/domain/train.py -f data.csv
+    $ python src/domain/train.py training_data.csv
+    $ python src/domain/train.py training_data.csv --epochs=5
 
 Script could be run with the following command line from a python interpreter :
 
-    >>> run src/domain/train.py -f data.csv
-
-Attributes
-----------
-PARSER: argparse.ArgumentParser
+    >>> run src/domain/train.py training_data.csv
+    >>> run src/domain/train.py training_data.csv --epochs=5
 
 """
 
 import argparse
 import logging
+import os
 
 import fire
 import pandas as pd
@@ -37,6 +36,8 @@ from src.infrastructure.make_dataset import DatasetBuilder
 
 
 class SentimentDataset(torch.utils.data.Dataset):
+    """Dataset object used by the pytorch model"""
+
     def __init__(self, encodings, labels):
         self.encodings = encodings
         self.labels = labels
@@ -51,6 +52,16 @@ class SentimentDataset(torch.utils.data.Dataset):
 
 
 def create_dataset(X, y, tokenizer):
+    """Creates a dataset to be passed to the model
+
+    Args:
+        X (list of strings): list of headlines
+        y (list of ints): list of sentiment (0='neutral', 1='positive', 2='negative')
+        tokenizer (huggingface tokenizer): the tokenizer to be used to tokenize the data
+
+    Returns:
+        Dataset: data ready to be used in the pytorch model
+    """
     train_texts, test_texts, train_labels, test_labels = train_test_split(X, y, test_size=0.15)
 
     train_encodings = tokenizer(train_texts, truncation=True, padding=True)
@@ -63,6 +74,14 @@ def create_dataset(X, y, tokenizer):
 
 
 def compute_metrics(pred):
+    """Compute the metrics for the model, when calling model.evaluate()
+
+    Args:
+        pred (int): prediction for the sentiment of a headline
+
+    Returns:
+        dict: dictionnary containing the chosen metrics
+    """
     labels = pred.label_ids
     preds = pred.predictions.argmax(-1)
     precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average="macro")
@@ -83,15 +102,15 @@ def train_model(
     model_name=stg.MODEL_NAME,
     epochs=5,
 ):
-    """[summary]
+    """Create a model based on model_name and fine-tunes it with the data from filename
 
     Args:
-        filename ([type]): [description]
-        path ([type], optional): [description]. Defaults to stg.TRAINING_DATA_DIR.
-        headline_col ([type], optional): [description]. Defaults to stg.HEADLINE_COL.
-        sentiment_col ([type], optional): [description]. Defaults to stg.SENTIMENT_COL.
-        model_name ([type], optional): [description]. Defaults to stg.MODEL_NAME.
-        epochs (int, optional): [description]. Defaults to 5.
+        filename ([type]): File containing the data - must be of type csv.
+        path ([type], optional): Path where filename is located. Defaults to stg.TRAINING_DATA_DIR.
+        headline_col ([type], optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.
+        sentiment_col ([type], optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.
+        model_name ([type], optional): Name of the model, from the list of huggingface models. Defaults to stg.MODEL_NAME.
+        epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.
     """
 
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
@@ -99,16 +118,11 @@ def train_model(
     logging.info("_" * 20)
     logging.info("_________ Launch new training ___________\n")
 
-    # try:
-    #     df = pd.read_csv(df_path)
-    # except FileNotFoundError:
-    #     raise
-
     logging.info("Loading data..")
     df = DatasetBuilder(filename, path).data
 
-    X = df["headline"].astype(str).tolist()
-    y = df["sentiment"].map({"neutral": 0, "positive": 1, "negative": 2}).tolist()
+    X = df[headline_col].astype(str).tolist()
+    y = df[sentiment_col].map({"neutral": 0, "positive": 1, "negative": 2}).tolist()
 
     config = AutoConfig.from_pretrained(model_name, num_labels=3)
     model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
@@ -135,12 +149,12 @@ def train_model(
     )
 
     logging.info("Training model..")
-    print("Training model...")
     trainer.train()
     trainer.evaluate()
 
-    trainer.save_model(f"./model/classifier_{model_name}")
-    tokenizer.save_pretrained(f"./model/tokenizer_{model_name}")
+    logging.info("Exporting model..")
+    trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier{model_name}"))
+    tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer{model_name}"))
 
 
 if __name__ == "__main__":
