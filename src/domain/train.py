@@ -103,11 +103,10 @@ def train_model(
     """Create a model based on model_name and fine-tunes it with the data from filename
 
     Args:
-        filename ([type]): File containing the data - must be of type csv.
-        path ([type], optional): Path where filename is located. Defaults to stg.TRAINING_DATA_DIR.
-        headline_col ([type], optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.
-        sentiment_col ([type], optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.
-        model_name ([type], optional): Name of the model, from the list of huggingface models. Defaults to stg.MODEL_NAME.
+        filename (string): File containing the data - must be of type csv.
+        path (string, optional): Path where filename is located. Defaults to stg.TRAINING_DATA_DIR.
+        headline_col (string, optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.
+        sentiment_col (string, optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.
         epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.
     """
 
