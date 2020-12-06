@@ -18,10 +18,16 @@ import src.settings.base as stg
 class DatasetBuilder:
     """Creates dataet from CSV file.
 
-    Attributes
-    ----------
-    data: dataset in a Pandas dataframe
+    Args:
+        filename (string): the name of the file to load - must be of type .csv.
+        path (string): the path to find the file
 
+    Raises:
+        FileExistsError: The given filename does not end with .csv.
+        FileNotFoundError: The file does not exist in the given directory.
+
+    Returns:
+        pandas.DataFrame: DataFrame containing the data
     """
 
     def __init__(self, filename, path):
@@ -33,20 +39,18 @@ class DatasetBuilder:
             return df
 
     def _check_file_extension(self, filename):
-        logging.info("Confirm file extension is .csv ..")
+        logging.info("Confirm file extension is .csv")
         if filename.endswith(".csv"):
-            logging.info(".. Done \n")
             return True
         else:
-            logging.info(".. ERROR: Extension must be .csv")
+            logging.error("Extension must be .csv")
             raise FileExistsError("Extension must be .csv")
 
     def _open_file(self, filename, path):
-        logging.info("Load data ..")
+        logging.info("Load data")
         try:
             df = pd.read_csv("".join((path, filename)), delimiter="@")
-            logging.info(".. Done \n")
             return df
         except FileNotFoundError as error:
-            logging.info(".. FileNotFoundError")
+            logging.error("FileNotFoundError")
             raise FileNotFoundError(f"Error in SalesDataset initialization - {error}")

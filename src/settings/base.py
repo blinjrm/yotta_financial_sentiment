@@ -19,12 +19,12 @@ MODEL_DIR = os.path.join(REPO_DIR, "model")
 def enable_logging(log_filename, logging_level=logging.DEBUG):
     """Set loggings parameters.
 
-    Parameters
-    ----------
-    log_filename: str
-    logging_level: logging.level
 
+    Args:
+        log_filename (str): name of the file where the logs are written
+        logging_level (logging.level, optional): Min level to log. Defaults to logging.DEBUG.
     """
+
     with open(os.path.join(LOGS_DIR, log_filename), "a") as file:
         file.write("\n")
         file.write("\n")
