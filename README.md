@@ -129,7 +129,7 @@ Activate the virtual environment
     - headline_col (string, optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.  
     - sentiment_col (string, optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.  
     - epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.  
-
+   
 - The trained model, tokenizer and config will be saved in the model/ directory. 
 
 

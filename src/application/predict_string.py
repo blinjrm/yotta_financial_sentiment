@@ -58,7 +58,9 @@ def make_prediction_string(sentence):
         pred = classifier(sentence)[0]
 
         print("\nSentiment analysis:")
-        print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
+        # print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
+
+        return pred
 
     else:
         logging.error("Typerror")
@@ -66,4 +68,4 @@ def make_prediction_string(sentence):
 
 
 if __name__ == "__main__":
-    fire.Fire(make_prediction_string)
+    prediction = fire.Fire(make_prediction_string)
