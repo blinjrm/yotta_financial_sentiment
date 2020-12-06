@@ -1,7 +1,7 @@
 # financial_sentiment
 
-Projet N°2 - Deep Learning
-Sujet : Sentiment analysis of financial news headlines
+Projet N°2 - Deep Learning  
+Sujet : Sentiment analysis of financial news headlines  
 
 Copyright : 2020, Damien Mellot & Jerome Blin
 
