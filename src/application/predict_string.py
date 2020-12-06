@@ -1,4 +1,4 @@
-"""Module to train the model.
+"""Module to evaluate the sentiment for a single sentence.
 
 Example
 -------
@@ -9,6 +9,8 @@ Script could be run with the following command line from the shell :
 Script could be run with the following command line from a python interpreter :
 
     >>> run src/application/predict_string.py "After a violent crash, the stock doesn't seem to recover"
+
+Use the flag --help to show usage information
 
 """
 
@@ -36,10 +38,10 @@ def make_prediction_string(sentence):
 
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
 
-    logging.info("-" * 40)
+    logging.info("_" * 40)
     logging.info("_________ New prediction ___________\n")
 
-    logging.info("Loading model, tokenizer and config..")
+    logging.info("Loading model, tokenizer and config")
     config = AutoConfig.from_pretrained(os.path.join(stg.MODEL_DIR, f"config_{stg.MODEL_NAME}"))
     tokenizer = RobertaTokenizer.from_pretrained(
         os.path.join(stg.MODEL_DIR, f"tokenizer_{stg.MODEL_NAME}")
@@ -48,17 +50,19 @@ def make_prediction_string(sentence):
         os.path.join(stg.MODEL_DIR, f"classifier_{stg.MODEL_NAME}"), config=config
     )
 
-    logging.info("Creating classifier..")
+    logging.info("Creating classifier")
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
     if isinstance(sentence, str):
-        logging.info("Making prediction on a string..")
-        preds = classifier(sentence)
-        for pred in preds:
-            print("\nSentiment analysis:")
-            print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
+        logging.info("Making prediction on a string")
+        pred = classifier(sentence)[0]
+
+        print("\nSentiment analysis:")
+        print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
+
     else:
-        raise TypeError("Data must be a single sentence or a Pandas DataFrame.")
+        logging.error("Typerror")
+        raise TypeError("Data must be a single sentence.")
 
 
 if __name__ == "__main__":
