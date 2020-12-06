@@ -12,6 +12,8 @@ Script could be run with the following command line from a python interpreter :
     >>> run src/domain/train.py training_data.csv
     >>> run src/domain/train.py training_data.csv --epochs=5
 
+Use the flag --help to show usage information
+
 """
 
 import logging
@@ -104,18 +106,18 @@ def train_model(
 
     Args:
         filename (string): File containing the data - must be of type csv.
-        path (string, optional): Path where filename is located. Defaults to stg.TRAINING_DATA_DIR.
-        headline_col (string, optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.
-        sentiment_col (string, optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.
+        path (string, optional): Path where filename is located. Defaults to ./data/training/.
+        headline_col (string, optional): Name of the column containing the headlines. Defaults to "headline".
+        sentiment_col (string, optional): Name of the column containing the target (sentiment). Defaults to "sentiment".
         epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.
     """
 
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
 
-    logging.info("40" * 20)
-    logging.info("_________ Launch new training ___________\n")
+    logging.info("_" * 40)
+    logging.info("_________ New training ___________\n")
 
-    logging.info("Loading data..")
+    logging.info("Loading data")
     df = DatasetBuilder(filename, path).data
 
     X = df[headline_col].astype(str).tolist()
@@ -147,11 +149,11 @@ def train_model(
         compute_metrics=compute_metrics,
     )
 
-    logging.info("Training model..")
+    logging.info("Training model")
     trainer.train()
     trainer.evaluate()
 
-    logging.info("Exporting model..")
+    logging.info("Exporting model")
     trainer.save_model(os.path.join(stg.MODEL_DIR, f"classifier_{stg.MODEL_NAME}"))
     tokenizer.save_pretrained(os.path.join(stg.MODEL_DIR, f"tokenizer_{stg.MODEL_NAME}"))
     config.save_pretrained(os.path.join(stg.MODEL_DIR, f"config_{stg.MODEL_NAME}"))
