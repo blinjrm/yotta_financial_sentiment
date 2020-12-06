@@ -38,6 +38,7 @@ ___
         │   └── xxx.py
         │
         ├── application                <- Scripts to use the trained models to make predictions.
+        │   ├── predict_string.py
         │   └── predict.py
         │
         ├── domain                     <- Sripts to fine-tune and save the model.
@@ -135,16 +136,34 @@ Activate the virtual environment
 ## 4. Use the model for predictions
 
 - The data used for prediction must be in the data/prediction/ directory
-- Run the training script using : 
+- Run the classification script using : 
 
     *from the shell :*
     ```
-    $ python src/application/predict.py -f new_data.csv
+    $ python src/application/predict.py data_4_prediction.csv
     ```
 
     *from a python interpreter :*
     ```
-    >>> run src/application/predict.py -f new_data.csv
+    >>> run src/application/predict.py data_4_prediction.csv
     ```
 
-- The file containing the predictions will be saved in the outputs/ directory as a csv file named *data_with_predictions.csv*  
+- The file containing the predictions will be saved in the data/outputs/ directory as a csv file named *data_with_predictions.csv*  
+
+
+## 5. Test the model on a single sentiment analysis
+
+You can also test the model by classifiying a single sentence   
+- Run the classification script using : 
+
+    *from the shell :*
+    ```
+    $ python src/application/predict_string.py "After a violent crash, the stock doesn't seem to recover"
+    ```
+
+    *from a python interpreter :*
+    ```
+    >>> run src/application/predict_string.py "After a violent crash, the stock doesn't seem to recover"
+    ```
+
+- The label and score will be printed to the terminal.  
