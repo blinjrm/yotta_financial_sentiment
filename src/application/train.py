@@ -17,6 +17,7 @@ Use the flag --help to show usage information
 """
 
 import logging
+import pprint
 
 import fire
 from transformers import Trainer, TrainingArguments
@@ -83,7 +84,7 @@ def train_model(
     trainer.train()
 
     logging.info("Evaluate model")
-    trainer.evaluate()
+    pprint.pprint(trainer.evaluate())
 
     logging.info("Export model")
     m.save_model(trainer)

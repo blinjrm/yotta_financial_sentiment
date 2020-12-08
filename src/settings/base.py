@@ -41,10 +41,16 @@ def enable_logging(log_filename, logging_level=logging.DEBUG):
 HEADLINE_COL = "headline"
 SENTIMENT_COL = "sentiment"
 MODEL_NAME = "distilroberta-base"
+SCRAPING_FILENAME = "scraped_headlines.csv"
 OUTPUT_FILENAME = "data_with_predictions.csv"
 
 ID2LABEL = {"0": "neutral", "1": "positive", "2": "negative"}
 LABEL2ID = {"neutral": 0, "positive": 1, "negative": 2}
 NUM_LABEL = len(LABEL2ID)
 
-MODELS = {"distilroberta": "distilroberta-base", "zero-shot": None}
+MODELS = {
+    "bert": "bert-base-uncased",
+    "distilroberta": "distilroberta-base",
+    "finbert": "ipuneetrathore/bert-base-cased-finetuned-finBERT",
+    "zero-shot-classifier": None,
+}

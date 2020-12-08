@@ -3,9 +3,11 @@
 """
 
 import logging
+import os
 
 import pandas as pd
 
+import src.settings.base as stg
 from src.infrastructure.infra import DatasetBuilder
 
 
@@ -59,3 +61,35 @@ def convert_predictions_dataframe(preds):
     df_preds = pd.DataFrame(predictions)
 
     return df_preds
+
+
+def list_trained_models():
+    """Lists the pretrained models that can be used for text classification.
+
+    Returns:
+        trained_models (list): list containing all the fine-tuned models fouund in the model/ directory
+    """
+
+    trained_models = []
+    for element in os.scandir(stg.MODEL_DIR):
+        if element.is_dir():
+            trained_models.append(element.name)
+
+    return trained_models
+
+
+def is_pretrained(model_name):
+    """Checks if the model chosen for prediction exists in the model/ directory, which means it has already been fine-tuned.
+
+    Args:
+        model_name (string): name of the model to be used for text classification
+
+    Returns:
+        True/False (boolean): Return True only if the model chosen exists in the model/ directory
+    """
+    trained_models = list_trained_models()
+
+    if model_name in trained_models:
+        return True
+    else:
+        return False

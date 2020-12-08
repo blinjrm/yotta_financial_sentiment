@@ -11,8 +11,14 @@ TrainedModelLoader
 
 import logging
 import os
+import re
+from datetime import date
 
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from dateutil.parser import parse
+from tqdm import tqdm
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
 import src.settings.base as stg
@@ -62,13 +68,13 @@ class DatasetBuilder:
 
 
 class ModelLoader:
-    """[summary]"""
+    """Initialize a new model and tokenizer from huggingface.co"""
 
     def __init__(self, model_name):
         self.model_name = model_name
-        self.model, self.tokenizer, self.config = self._load_model()
+        self.model, self.tokenizer, self.config = self._create_model()
 
-    def _load_model(self):
+    def _create_model(self):
         config = AutoConfig.from_pretrained(
             self.model_name, num_labels=stg.NUM_LABEL, id2label=stg.ID2LABEL, label2id=stg.LABEL2ID
         )
@@ -84,7 +90,7 @@ class ModelLoader:
 
 
 class TrainedModelLoader:
-    """[summary]"""
+    """Load a fine-tuned model and tokenizer for classification"""
 
     def __init__(self, model_name):
         self.model_name = model_name
@@ -92,10 +98,48 @@ class TrainedModelLoader:
 
     def _load_model(self):
         config = AutoConfig.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
-        # tokenizer = RobertaTokenizer.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
         tokenizer = AutoTokenizer.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
         model = AutoModelForSequenceClassification.from_pretrained(
             os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), config=config
         )
 
         return model, tokenizer
+
+
+class HeadlinesReuters:
+    """Web scraping from reuters.com"""
+
+    def __init__(self, edition, domain, n_pages):
+        self.edition = edition
+        self.domain = domain
+        self.n_pages = n_pages
+        self.data = self._get_data()
+
+    def _get_data(self):
+        print(f"Getting headlines for {self.domain}")
+
+        headlines = {"headline": [], "date": [], "edition": []}
+
+        for i in tqdm(range(1, self.n_pages + 1)):
+
+            url = f"{self.domain}/news/archive/marketsNews?view=page&page={i}&pageSize=10"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, "html.parser")
+            articles = soup.findAll("div", class_="story-content")
+
+            for article in articles:
+                try:
+                    headline = article.find("h3", class_="story-title").text
+                    date = article.find("span", class_="timestamp").text
+
+                    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", headline).strip()
+                    date_clean = parse(date).strftime("%Y-%m-%d")
+
+                    headlines["headline"].append(headline_clean)
+                    headlines["date"].append(date_clean)
+                    headlines["edition"].append(self.edition)
+
+                except:
+                    pass
+
+        return pd.DataFrame(headlines)
