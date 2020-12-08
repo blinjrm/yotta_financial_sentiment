@@ -45,3 +45,6 @@ OUTPUT_FILENAME = "data_with_predictions.csv"
 
 ID2LABEL = {"0": "neutral", "1": "positive", "2": "negative"}
 LABEL2ID = {"neutral": 0, "positive": 1, "negative": 2}
+NUM_LABEL = len(LABEL2ID)
+
+MODELS = {"distilroberta": "distilroberta-base", "zero-shot": None}

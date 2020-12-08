@@ -15,22 +15,22 @@ Use the flag --help to show usage information
 """
 
 import logging
-import os
 
 import fire
-import pandas as pd
-import torch
-from transformers import AutoConfig, AutoModelForSequenceClassification, RobertaTokenizer, pipeline
+
+# import pandas as pd
+from transformers import pipeline
 
 import src.settings.base as stg
-from src.infrastructure.make_dataset import DatasetBuilder
+from src.infrastructure.infra import TrainedModelLoader
 
 
-def make_prediction_string(sentence):
+def make_prediction_string(sentence, model_name=stg.MODEL_NAME):
     """Use the pretrained model to make evaluate the sentiment of a string.
 
     Args:
         sentence (string): a prediction will be made for the sentence and printed in the terminal.
+        model_name (string, optional): Name of the model to use for predictions. Defaults to distilroberta-base.
 
     Raises:
         TypeError: an error is raised it the data in not a string.
@@ -39,26 +39,20 @@ def make_prediction_string(sentence):
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
 
     logging.info("_" * 40)
-    logging.info("_________ New prediction ___________\n")
+    logging.info("_____ New prediction on a sentence _____\n")
 
-    logging.info("Loading model, tokenizer and config")
-    config = AutoConfig.from_pretrained(os.path.join(stg.MODEL_DIR, f"config_{stg.MODEL_NAME}"))
-    tokenizer = RobertaTokenizer.from_pretrained(
-        os.path.join(stg.MODEL_DIR, f"tokenizer_{stg.MODEL_NAME}")
-    )
-    model = AutoModelForSequenceClassification.from_pretrained(
-        os.path.join(stg.MODEL_DIR, f"classifier_{stg.MODEL_NAME}"), config=config
-    )
+    logging.info("Load model and tokenizer")
+    m = TrainedModelLoader(model_name)
 
-    logging.info("Creating classifier")
-    classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
+    logging.info("Create classifier")
+    classifier = pipeline("sentiment-analysis", model=m.model, tokenizer=m.tokenizer)
 
     if isinstance(sentence, str):
-        logging.info("Making prediction on a string")
+        logging.info("Make prediction on a string")
         pred = classifier(sentence)[0]
 
         print("\nSentiment analysis:")
-        # print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
+        print(f"Label: {pred['label']}, with score: {round(pred['score'], 4)}")
 
         return pred
 
@@ -69,3 +63,12 @@ def make_prediction_string(sentence):
 
 if __name__ == "__main__":
     prediction = fire.Fire(make_prediction_string)
+
+
+# zero_shot_classifier = pipeline("zero-shot-classification")
+# labels = list(stg.LABEL2ID.keys())
+# results = zero_shot_classifier(sentece, labels)
+# SCORES = results["scores"]
+# CLASSES = results["labels"]
+# BEST_INDEX = argmax(SCORES)
+# predicted_class = CLASSES[BEST_INDEX]

@@ -1,9 +1,13 @@
-import streamlit as st
-import numpy as np
-import pandas as pd
+import logging
 import time
 
-from src import make_prediction_string
+import numpy as np
+import pandas as pd
+import pydeck
+import streamlit as st
+
+import src.settings.base as stg
+from src import make_prediction_string, plotly_map, pydeck_map
 
 
 def single_sentence():
@@ -31,9 +35,16 @@ def list_headlines():
             show_country[country] = False
 
     left_column, right_column = st.beta_columns(2)
-    pressed = left_column.button("Show countries?")
-    if pressed:
+    bt1 = left_column.button("Show countries?")
+    if bt1:
         right_column.write(show_country)
+
+    bt2 = st.button("Show map")
+    if bt2:
+        r = pydeck_map()
+        r
+        # fig = plotly_map()
+        # st.text(fig.show())
 
 
 def main():
@@ -50,7 +61,7 @@ def main():
     st.text(" ")
     st.text(" ")
     option = st.sidebar.selectbox(
-        "I want to...", ["analyze a single sentence", "see the dashboard"]
+        "I want to...", ["analyze a single sentence", "see the dashboard", "test model performance"]
     )
     "Currently enabling predictions for: ", option
 
@@ -58,9 +69,12 @@ def main():
 
     if option == "analyze a single sentence":
         single_sentence()
-    else:
+    else if option == "see the dashboard":
         list_headlines()
+    else:
+        pass
 
 
 if __name__ == "__main__":
+    stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
     main()
