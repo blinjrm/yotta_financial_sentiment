@@ -50,44 +50,50 @@ def train_model(
     logging.info("_" * 40)
     logging.info("_________ New training ___________\n")
 
-    logging.info("Load data")
-    df = DatasetBuilder(filename, path).data
+    if model_name in stg.MODELS.keys():
 
-    X = df[headline_col].astype(str).tolist()
-    y = df[sentiment_col].map(stg.LABEL2ID).tolist()
+        logging.info("Load model")
+        m = ModelLoader(stg.MODELS[model_name])
 
-    logging.info("Load model")
-    m = ModelLoader(model_name)
+        logging.info("Load data")
+        df = DatasetBuilder(filename, path).data
 
-    logging.info("Create dataset")
-    train_dataset, test_dataset = create_dataset(X, y, m.tokenizer)
+        X = df[headline_col].astype(str).tolist()
+        y = df[sentiment_col].map(stg.LABEL2ID).tolist()
 
-    training_args = TrainingArguments(
-        output_dir="./results",
-        num_train_epochs=epochs,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=64,
-        warmup_steps=500,
-        weight_decay=0.01,
-        logging_dir="./logs",
-    )
+        logging.info("Create dataset")
+        train_dataset, test_dataset = create_dataset(X, y, m.tokenizer)
 
-    trainer = Trainer(
-        model=m.model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=test_dataset,
-        compute_metrics=compute_metrics,
-    )
+        training_args = TrainingArguments(
+            output_dir="./results",
+            num_train_epochs=epochs,
+            per_device_train_batch_size=16,
+            per_device_eval_batch_size=64,
+            warmup_steps=500,
+            weight_decay=0.01,
+            logging_dir="./logs",
+        )
 
-    logging.info("Train model")
-    trainer.train()
+        trainer = Trainer(
+            model=m.model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=test_dataset,
+            compute_metrics=compute_metrics,
+        )
 
-    logging.info("Evaluate model")
-    pprint.pprint(trainer.evaluate())
+        logging.info("Train model")
+        trainer.train()
 
-    logging.info("Export model")
-    m.save_model(trainer)
+        logging.info("Evaluate model")
+        pprint.pprint(trainer.evaluate())
+
+        logging.info("Export model")
+        m.save_model(trainer)
+
+    else:
+        print(f"The model '{model_name}' cannot be used for this project.")
+        print(f"the available models are: {list(stg.MODELS.keys())}.")
 
 
 if __name__ == "__main__":
