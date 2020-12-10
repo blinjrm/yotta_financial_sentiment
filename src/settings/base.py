@@ -54,3 +54,6 @@ MODELS = {
     "distilroberta": "distilroberta-base",
     "finbert": "ipuneetrathore/bert-base-cased-finetuned-finBERT",
 }
+
+SCRAPING_WEBSITES = ["reuters", "financial_times"]
+SCRAPING_START_DATE = "2020-12-07"
