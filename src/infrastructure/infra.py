@@ -9,6 +9,7 @@ TrainedModelLoader
 """
 
 
+from dataclasses import dataclass
 import logging
 import os
 import re
@@ -97,10 +98,14 @@ class TrainedModelLoader:
         self.model, self.tokenizer = self._load_model()
 
     def _load_model(self):
-        config = AutoConfig.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
-        tokenizer = AutoTokenizer.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
+        config = AutoConfig.from_pretrained(
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), local_files_only=True
+        )
+        tokenizer = AutoTokenizer.from_pretrained(
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), local_files_only=True
+        )
         model = AutoModelForSequenceClassification.from_pretrained(
-            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), config=config
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), config=config, local_files_only=True
         )
 
         return model, tokenizer
@@ -178,7 +183,7 @@ def get_headlines_ft(early_date):
 
     while date_clean >= early_date:
 
-        # print(f"Getting headlines from Financial Times - page {i}", end="\r")
+        print(f"Getting headlines from Financial Times - page {i}", end="\r")
 
         url = f"https://www.ft.com/markets?page={i}"
         response = requests.get(url)

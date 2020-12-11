@@ -1,50 +1,74 @@
 import logging
-import time
 
-import numpy as np
 import pandas as pd
-import pydeck
 import streamlit as st
 
 import src.settings.base as stg
-from src import make_prediction_string, plotly_map, pydeck_map
+
+from src.application.predict_string import make_prediction_string
+from src.domain.predict_utils import list_trained_models
 
 
 def single_sentence():
+
+    st.header("Sentiment analysis on a sentence")
+
+    trained_models = list_trained_models()
+    trained_models.append("zero-shot-classifier")
+
+    st.sidebar.markdown("-" * 17)
+    model = st.sidebar.radio("Choose a model:", (trained_models))
 
     sentence = st.text_input(label="Type a sentence for sentiment analysis:")
 
     if len(sentence) > 1:
         with st.spinner("Analyzing..."):
-            prediction = make_prediction_string(sentence)
+            prediction = make_prediction_string(sentence, model_name=model)
 
         st.text("\nSentiment analysis:")
         st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
 
 
-def list_headlines():
-    st.sidebar.text("")
-    st.sidebar.text("Which countries \ndo you want to include?")
+def project_description():
+    description = """Some text
+    """
+    st.beta_container
 
-    show_country = {"USA": True, "UK": True, "China": True}
-    for country in show_country.keys():
-        checkbox_show_country = st.sidebar.checkbox(label=country, value=True)
-        if checkbox_show_country:
-            show_country[country] = True
+    st.markdown(description)
+
+
+def list_headlines():
+
+    st.header("Financial sentiment in the USA throughout 2020")
+
+    st.sidebar.text("")
+    st.sidebar.text("Which neswpaper \ndo you want to include?")
+
+    show_newspapers = {"Reuters": True, "Financial Times": True}
+    for newspaper, value in show_newspapers.items():
+        checkbox_show_newspapers = st.sidebar.checkbox(label=newspaper, value=value)
+        if checkbox_show_newspapers:
+            show_newspapers[newspaper] = True
         else:
-            show_country[country] = False
+            show_newspapers[newspaper] = False
 
     left_column, right_column = st.beta_columns(2)
-    bt1 = left_column.button("Show countries?")
+    bt1 = left_column.button("Show newspapers?")
     if bt1:
-        right_column.write(show_country)
+        right_column.write(show_newspapers)
 
-    bt2 = st.button("Show map")
-    if bt2:
-        r = pydeck_map()
-        r
-        # fig = plotly_map()
-        # st.text(fig.show())
+
+def model_performance():
+
+    trained_models = list_trained_models()
+
+    st.sidebar.text("")
+    model = st.sidebar.radio("Choose a model:", (trained_models))
+
+    if model == "roberta-base":
+        st.header("Showing roberta-base")
+    else:
+        st.header("distilroberta-base")
 
 
 def main():
@@ -61,18 +85,20 @@ def main():
     st.text(" ")
     st.text(" ")
     option = st.sidebar.selectbox(
-        "I want to...", ["analyze a single sentence", "see the dashboard", "test model performance"]
+        "I want to...",
+        ["", "analyze a single sentence", "see the dashboard", "see model performance"],
     )
-    "Currently enabling predictions for: ", option
 
     st.text(" ")
 
-    if option == "analyze a single sentence":
+    if option == "":
+        project_description()
+    elif option == "analyze a single sentence":
         single_sentence()
-    else if option == "see the dashboard":
+    elif option == "see the dashboard":
         list_headlines()
     else:
-        pass
+        model_performance()
 
 
 if __name__ == "__main__":

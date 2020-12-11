@@ -40,7 +40,7 @@ def enable_logging(log_filename, logging_level=logging.DEBUG):
 
 HEADLINE_COL = "headline"
 SENTIMENT_COL = "sentiment"
-MODEL_NAME = "distilroberta"
+MODEL_NAME = "roberta-base"
 SCRAPING_FILENAME = "scraped_headlines.csv"
 OUTPUT_FILENAME = "data_with_predictions.csv"
 
