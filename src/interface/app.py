@@ -7,7 +7,8 @@ import pydeck
 import streamlit as st
 
 import src.settings.base as stg
-from src import make_prediction_string, plotly_map, pydeck_map
+from src.application.predict_string import make_prediction_string
+from src.domain.predict_utils import list_trained_models
 
 
 def single_sentence():

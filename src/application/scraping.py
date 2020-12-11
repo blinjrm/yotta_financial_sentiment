@@ -24,7 +24,7 @@ import fire
 import pandas as pd
 
 import src.settings.base as stg
-from src.infrastructure.infra import get_headlines_reuters, get_headlines_ft
+from src.infrastructure.infra import WebScraper, get_headlines_ft, get_headlines_reuters
 
 
 def get_headlines(website=stg.SCRAPING_WEBSITES, early_date=stg.SCRAPING_START_DATE):
@@ -49,16 +49,20 @@ def get_headlines(website=stg.SCRAPING_WEBSITES, early_date=stg.SCRAPING_START_D
     else:
 
         if "reuters" in website:
-            print("\nGetting headlines for Reuters:")
-            df_headlines_reuters = get_headlines_reuters(early_date)
+            logging.info("Scrape headlines from Reuters")
+            stg.PARAMS_REUTERS["early_date"] = early_date
+            df_headlines_reuters = WebScraper(**stg.PARAMS_REUTERS).get_headlines()
             df_headlines = pd.concat(
                 [df_headlines, df_headlines_reuters], axis=0, ignore_index=True
             )
 
         if "financial_times" in website:
-            print("\nGetting headlines for Financial Times:")
-            df_headlines_ft = get_headlines_ft(early_date)
-            df_headlines = pd.concat([df_headlines, df_headlines_ft], axis=0, ignore_index=True)
+            logging.info("Scrape headlines from Financial Times")
+            stg.PARAMS_FT["early_date"] = early_date
+            df_headlines_reuters = WebScraper(**stg.PARAMS_FT).get_headlines()
+            df_headlines = pd.concat(
+                [df_headlines, df_headlines_reuters], axis=0, ignore_index=True
+            )
 
         logging.info("Export results")
         df_headlines.to_csv(

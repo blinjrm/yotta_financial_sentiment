@@ -5,6 +5,7 @@ Classes
 DatasetBuilder
 ModelLoader
 TrainedModelLoader
+WebScraper
 
 """
 
@@ -12,7 +13,7 @@ TrainedModelLoader
 import logging
 import os
 import re
-import sys
+from dataclasses import dataclass
 from datetime import date
 
 import pandas as pd
@@ -106,109 +107,67 @@ class TrainedModelLoader:
         return model, tokenizer
 
 
-def clean_headline_date(headline, date):
-    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", headline).strip()
-    date_clean = parse(date).strftime("%Y-%m-%d")
+@dataclass
+class WebScraper:
+    """Scrape headlines and publication dates from news websites"""
 
-    return headline_clean, date_clean
+    newspaper: str
+    early_date: str
+    url: str
+    html_articles: list
+    html_headline: list
+    html_date: list
 
+    def get_headlines(self):
+        """Get headlines and date of news articles.
 
-def get_headlines_reuters(early_date):
-    """Scrapes the headlines for financial news from reuters.com
+        Returns:
+            df (DataFrame): DataFrame conaining the headlines and data scraped, with the name of the website.
+        """
 
-    Args:
-        early_date (string): Earliest date to crape headlines from.
+        print(f"\nGetting headlines from {self.newspaper}:\n")
 
-    Returns:
-        df: DataFrame containing the headlines and publication dates.
-    """
+        headlines = {"headline": [], "date": []}
+        date_clean = date.today().strftime("%Y-%m-%d")
+        i = 1
 
-    headlines = {"headline": [], "date": []}
-    date_clean = date.today().strftime("%Y-%m-%d")
-    i = 1
+        while date_clean >= self.early_date:
 
-    while date_clean >= early_date:
+            url = self.url.format(i=i)
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, "html.parser")
 
-        print(f"Current page:{i}, current date: {date_clean}", end="\r")
-
-        url = f"https://www.reuters.com/news/archive/marketsNews?view=page&page={i}&pageSize=10"
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        try:
-            articles = soup.findAll("div", class_="story-content")
-        except:
-            break
-
-        for article in articles:
             try:
-                headline = article.find("h3", class_="story-title").text
-                date_ = article.find("span", class_="timestamp").text
-
-                headline_clean, date_clean = clean_headline_date(headline, date_)
-
-                if date_clean < early_date:
-                    break
-
-                headlines["headline"].append(headline_clean)
-                headlines["date"].append(date_clean)
+                articles = soup.findAll(self.html_articles[0], class_=self.html_articles[1])
             except:
-                pass
+                break
 
-        i += 1
+            if len(articles) < 3:
+                break
 
-    df = pd.DataFrame(headlines)
-    df["source"] = "Reuters"
-    return df
+            for article in articles:
+                try:
+                    headline = article.find(
+                        self.html_headline[0], class_=self.html_headline[1]
+                    ).text
+                    date_ = article.find(self.html_date[0], class_=self.html_date[1]).text
 
+                    print(f"Current page:{i}, current date: {date_clean}", end="\r")
 
-def get_headlines_ft(early_date):
-    """Scrapes the headlines for financial news from ft.com
+                    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", headline).strip()
+                    date_clean = parse(date_).strftime("%Y-%m-%d")
 
-    Args:
-        early_date (string): Earliest date to crape headlines from.
+                    if date_clean < self.early_date:
+                        break
 
-    Returns:
-        df: DataFrame containing the headlines and publication dates.
-    """
+                    headlines["headline"].append(headline_clean)
+                    headlines["date"].append(date_clean)
+                except:
+                    pass
 
-    headlines = {"headline": [], "date": []}
-    date_clean = date.today().strftime("%Y-%m-%d")
-    i = 1
+            i += 1
 
-    while date_clean >= early_date:
+        df = pd.DataFrame(headlines)
+        df["source"] = self.newspaper
 
-        # print(f"Getting headlines from Financial Times - page {i}", end="\r")
-
-        url = f"https://www.ft.com/markets?page={i}"
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        try:
-            articles = soup.findAll("li", class_="o-teaser-collection__item o-grid-row")
-
-        except:
-            break
-
-        for article in articles:
-            try:
-                headline = article.find("a", class_="js-teaser-heading-link").text
-                date_ = article.find("time", class_="o-date o-teaser__timestamp").text
-
-                print(f"Current page:{i}, current date: {date_clean}", end="\r")
-
-                headline_clean, date_clean = clean_headline_date(headline, date_)
-
-                if date_clean < early_date:
-                    break
-
-                headlines["headline"].append(headline_clean)
-                headlines["date"].append(date_clean)
-            except:
-                pass
-
-        i += 1
-
-    df = pd.DataFrame(headlines)
-    df["source"] = "Financial Times"
-    return df
+        return df
