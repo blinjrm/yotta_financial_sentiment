@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 
 import src.settings.base as stg
-
 from src.application.predict_string import make_prediction_string
 from src.domain.predict_utils import list_trained_models
 

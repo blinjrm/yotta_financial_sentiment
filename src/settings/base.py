@@ -56,4 +56,22 @@ MODELS = {
 }
 
 SCRAPING_WEBSITES = ["reuters", "financial_times"]
-SCRAPING_START_DATE = "2020-12-07"
+SCRAPING_START_DATE = "2020-12-10"
+
+PARAMS_REUTERS = {
+    "newspaper": "Reuters",
+    "early_date": SCRAPING_START_DATE,
+    "url": "https://www.reuters.com/news/archive/marketsNews?view=page&page={i}&pageSize=10",
+    "html_articles": ["div", "story-content"],
+    "html_headline": ["h3", "story-title"],
+    "html_date": ["span", "timestamp"],
+}
+
+PARAMS_FT = {
+    "newspaper": "Financial Times",
+    "early_date": SCRAPING_START_DATE,
+    "url": "https://www.ft.com/markets?page={i}",
+    "html_articles": ["li", "o-teaser-collection__item o-grid-row"],
+    "html_headline": ["a", "js-teaser-heading-link"],
+    "html_date": ["time", "o-date o-teaser__timestamp"],
+}
