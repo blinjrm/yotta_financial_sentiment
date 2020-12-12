@@ -10,7 +10,7 @@ import os
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 TRAINING_DATA_DIR = os.path.join(REPO_DIR, "data/training/")
 PREDICTION_DATA_DIR = os.path.join(REPO_DIR, "data/prediction/")
-OUTPUTS_DIR = os.path.join(REPO_DIR, "data/output")
+OUTPUTS_DIR = os.path.join(REPO_DIR, "data/output/")
 LOGS_DIR = os.path.join(REPO_DIR, "logs")
 MODEL_DIR = os.path.join(REPO_DIR, "model")
 

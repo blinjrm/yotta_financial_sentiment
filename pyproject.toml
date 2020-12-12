@@ -13,6 +13,9 @@ fire = "^0.3.1"
 torch = "^1.7.0"
 streamlit = "^0.72.0"
 beautifulsoup4 = "^4.9.3"
+plotly = "^4.14.1"
+matplotlib = "^3.3.3"
+seaborn = "^0.11.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}

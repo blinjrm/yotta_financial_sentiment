@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 import numpy as np
 import pandas as pd
@@ -16,6 +17,8 @@ from src.infrastructure.infra import DatasetBuilder
 
 def project_description():
 
+    st.title("Sentiment analysis of financial headlines")
+
     description = """ 
     ## Some text
     """
@@ -25,7 +28,7 @@ def project_description():
 
 def single_sentence():
 
-    st.header("Sentiment analysis on a sentence")
+    st.title("Sentiment analysis on a sentence")
     st.text("")
 
     trained_models = list_trained_models()
@@ -42,35 +45,26 @@ def single_sentence():
         st.text("\nSentiment analysis:")
         st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
 
+    # TODO: add model description
+
 
 def dashboard():
 
-    st.header("Financial sentiment in the USA throughout 2020")
+    st.title("Financial sentiment in the USA throughout 2020")
     st.text("")
 
     st.sidebar.text("Choose display options:")
-
-    display_options = ["Tendencies", "Newspapers", "Raw data"]
-    st.sidebar.radio(label="", options=display_options)
-
-    # dashboard_options = {"Raw data": False, "Graph sentiment": True, "Stock": True}
-    # for option, value in dashboard_options.items():
-    #     checkbox_dashboard_options = st.sidebar.checkbox(label=option, value=value)
-    #     if checkbox_dashboard_options:
-    #         dashboard_options[option] = True
-    #     else:
-    #         dashboard_options[option] = False
+    display_option = st.sidebar.radio(label="", options=["Tendencies", "Newspapers", "Raw data"])
 
     st.sidebar.markdown("---")
 
-    st.sidebar.text("Which newspaper \ndo you want to include?")
-    show_newspapers = {"Reuters": True, "Financial Times": True}
-    for newspaper, value in show_newspapers.items():
-        checkbox_show_newspapers = st.sidebar.checkbox(label=newspaper, value=value)
-        if checkbox_show_newspapers:
-            show_newspapers[newspaper] = True
-        else:
-            show_newspapers[newspaper] = False
+    # show_newspapers = {"Reuters": True, "Financial Times": True}
+    # for newspaper, value in show_newspapers.items():
+    #     checkbox_show_newspapers = st.sidebar.checkbox(label=newspaper, value=value)
+    #     if checkbox_show_newspapers:
+    #         show_newspapers[newspaper] = True
+    #     else:
+    #         show_newspapers[newspaper] = False
 
     df = DatasetBuilder(stg.OUTPUT_FILENAME, stg.OUTPUTS_DIR).data
 
@@ -80,27 +74,27 @@ def dashboard():
     df.loc[df["label"] == "neutral", "sentiment"] = 0
     df.loc[df["label"] == "positive", "sentiment"] = 1
 
-    if dashboard_options["Raw data"] == True:
-        df
+    if display_option == "Tendencies":
+        pass
+
+    elif display_option == "Newspapers":
+
+        newspaper_option = st.select_slider(
+            label="Which newspaper do you want to include?",
+            options=["Reuters", "Both", "Financial Times"],
+            value=(("Both")),
+        )
+
+        col1, col2 = st.beta_columns(2)
+        start_date = col1.date_input("Start date", datetime.date(2020, 3, 1))
+        end_date = col2.date_input("End date", datetime.date(2020, 11, 30))
+
+        # smooth = st.slider("Smooth curve", min_value=0, max_value=100)
+        smooth = st.select_slider(
+            label="Smooth curve", options=["Day", "Week", "Month", "Year"], value=(("Week"))
+        )
         st.text("")
 
-        label_repartition = (
-            df["label"].value_counts().rename_axis("label").reset_index(name="total")
-        )
-
-        fig = plt.figure(figsize=(8, 4))
-        sns.barplot(
-            x="total",
-            y="label",
-            data=label_repartition,
-            order=["negative", "neutral", "positive"],
-            palette="Blues_d",
-        )
-        sns.despine(left=True, bottom=True)
-        plt.title("Total number of headlines per sentiment class")
-        st.pyplot(fig)
-
-    if dashboard_options["Graph sentiment"] == True:
         pivot = df.pivot_table(values="sentiment", index="source", columns="date", aggfunc=np.mean)
 
         fig, ax = plt.subplots()
@@ -121,23 +115,35 @@ def dashboard():
         ax.set_ylim(-0.4, 0.4)
         st.pyplot(fig)
 
-    if dashboard_options["Stock"] == True:
-        pass
+    elif display_option == "Raw data":
+        df
+        st.text("")
+
+        label_repartition = (
+            df["label"].value_counts().rename_axis("label").reset_index(name="total")
+        )
+
+        fig = plt.figure(figsize=(8, 4))
+        sns.barplot(
+            x="total",
+            y="label",
+            data=label_repartition,
+            order=["negative", "neutral", "positive"],
+            palette="Blues_d",
+        )
+        sns.despine(left=True, bottom=True)
+        plt.title("Total number of headlines per sentiment class")
+        st.pyplot(fig)
 
 
 def model_performance():
 
-    st.header("Model performance")
+    st.title("Model performance")
     st.text("")
 
     trained_models = list_trained_models()
-
     model = st.sidebar.radio("Choose a model:", (trained_models))
-
-    if model == "roberta-base":
-        st.text("Showing roberta-base")
-    else:
-        st.text("distilroberta-base")
+    st.header(f"Showing {model}")
 
 
 def main():
@@ -149,11 +155,15 @@ def main():
         initial_sidebar_state="auto",
     )
 
-    st.title("Sentiment analysis of financial headlines")
-
     option = st.sidebar.selectbox(
         "I want to...",
-        ["", "analyze a single sentence", "see the dashboard", "see model performance"],
+        [
+            "",
+            "analyze a single sentence",
+            "view the dashboard",
+            "compare model performance",
+            "see some ballons",
+        ],
     )
 
     st.text(" ")
@@ -163,10 +173,16 @@ def main():
         project_description()
     elif option == "analyze a single sentence":
         single_sentence()
-    elif option == "see the dashboard":
+    elif option == "view the dashboard":
         dashboard()
-    else:
+    elif option == "compare model performance":
         model_performance()
+    else:
+        st.balloons()
+        st.sidebar.markdown("Because 2020 wasn't *all* bad.")
+        balloons = st.sidebar.button("Again! 🤩")
+        if balloons:
+            st.balloons()
 
 
 if __name__ == "__main__":
