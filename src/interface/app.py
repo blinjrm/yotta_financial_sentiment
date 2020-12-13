@@ -1,17 +1,14 @@
 import logging
 import os
 
-import numpy as np
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
 import datetime
 
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
 from src.domain.predict_utils import list_trained_models
-from src.domain.app_utils import load_data_app, newspapers_data, newspapers_plot
+from src.domain.app_utils import newspapers_plot, raw_data_plot, tendency_plot
 
 
 def project_description():
@@ -57,10 +54,10 @@ def dashboard():
 
     st.sidebar.markdown("---")
 
-    # df = load_data_app()
-
     if display_option == "Tendencies":
-        pass
+        st.text("")
+        fig = tendency_plot()
+        st.pyplot(fig)
 
     elif display_option == "Newspapers":
 
@@ -75,7 +72,7 @@ def dashboard():
         )
 
         smooth = col2.select_slider(
-            label="Smooth curve", options=["Day", "Week", "Month"], value=(("Week"))
+            label="Granularity", options=["Day", "Week", "Month"], value=(("Week"))
         )
         st.text("")
 
@@ -83,23 +80,11 @@ def dashboard():
         st.pyplot(fig)
 
     elif display_option == "Raw data":
-        df
+
+        df, fig = raw_data_plot()
+
         st.text("")
-
-        label_repartition = (
-            df["label"].value_counts().rename_axis("label").reset_index(name="total")
-        )
-
-        fig = plt.figure(figsize=(8, 4))
-        sns.barplot(
-            x="total",
-            y="label",
-            data=label_repartition,
-            order=["negative", "neutral", "positive"],
-            palette="Blues_d",
-        )
-        sns.despine(left=True, bottom=True)
-        plt.title("Total number of headlines per sentiment class")
+        st.text(df)
         st.pyplot(fig)
 
 

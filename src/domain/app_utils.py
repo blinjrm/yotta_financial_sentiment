@@ -3,12 +3,13 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
 import src.settings.base as stg
 from src.infrastructure.infra import DatasetBuilder
 
 
-@st.cache
+@st.cache()
 def load_data_app():
 
     df = DatasetBuilder(stg.OUTPUT_FILENAME, stg.OUTPUTS_DIR).data
@@ -23,8 +24,9 @@ def load_data_app():
     return df
 
 
-@st.cache
+@st.cache()
 def newspapers_data(start_date, end_date, newspaper, smooth):
+
     df = load_data_app()
     df_with_dates = df[(df["date"] >= start_date) & (df["date"] <= end_date)]
 
@@ -43,11 +45,12 @@ def newspapers_data(start_date, end_date, newspaper, smooth):
 
 
 def newspapers_plot(start_date, end_date, newspaper, smooth):
+
     df = newspapers_data(start_date, end_date, newspaper, smooth)
 
     fig, ax = plt.subplots()
     sns.lineplot(data=df.T, palette="Accent", linewidth=1)
-    sns.despine(left=True, bottom=True, right=True)
+    sns.despine()
 
     if smooth == "Day":
         ax.xaxis.set_major_locator(plt.MaxNLocator(15))
@@ -62,13 +65,67 @@ def newspapers_plot(start_date, end_date, newspaper, smooth):
     return fig
 
 
+def raw_data_plot():
+
+    df = load_data_app()
+
+    label_repartition = df["label"].value_counts().rename_axis("label").reset_index(name="total")
+
+    fig = plt.figure(figsize=(8, 4))
+    sns.barplot(
+        x="total",
+        y="label",
+        data=label_repartition,
+        order=["negative", "neutral", "positive"],
+        palette="Accent",
+    )
+    sns.despine(left=True, bottom=True)
+    plt.title("Total number of headlines per sentiment class")
+
+    return df, fig
+
+
+def tendency_data():
+    sentiment = load_data_app()
+    sentiment = (
+        sentiment.drop(columns=["headline", "label", "score", "source", "month", "week"])
+        .groupby("date")
+        .mean()
+    )
+
+    stock = pd.read_csv("".join((stg.APP_DATA_DIR, "stock_sp500.csv")))
+    stock = (
+        stock.drop(columns=["Open", "High", "Low", "Adj Close"])
+        .set_index("Date")
+        .rename(columns={"Close": "S&P500"})
+    )
+
+    data = sentiment.join(stock, how="left")
+
+    return data
+
+
+def tendency_plot():
+    data = tendency_data()
+
+    min_max_scaler = MinMaxScaler()
+    data_scaled = min_max_scaler.fit_transform(data)
+    df = pd.DataFrame(data_scaled, columns=data.columns)
+
+    fig, ax = plt.subplots()
+    sns.lineplot(data=df, palette="Accent", linewidth=1)
+    sns.despine()
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    plt.legend(bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    plt.title(
+        "Evolution of daily financial sentiment, S&P500 index \nand trading volume (normalized)"
+    )
+
+    return fig
+
+
 if __name__ == "__main__":
-    import datetime
 
-    start_date = "2020-03-01"
-    end_date = "2020-11-30"
-    newspaper = "Both"
-    smooth = "Month"
-
-    df = newspapers_data(start_date, end_date, newspaper, smooth)
-    print(df)
+    data = tendency_data()
+    print(data)
