@@ -1,6 +1,5 @@
 import logging
 import os
-import time
 
 import numpy as np
 import pandas as pd
@@ -12,7 +11,7 @@ import datetime
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
 from src.domain.predict_utils import list_trained_models
-from src.infrastructure.infra import DatasetBuilder
+from src.domain.app_utils import load_data_app, newspapers_data, newspapers_plot
 
 
 def project_description():
@@ -50,7 +49,7 @@ def single_sentence():
 
 def dashboard():
 
-    st.title("Financial sentiment in the USA throughout 2020")
+    st.title("Financial sentiment in the USA in 2020")
     st.text("")
 
     st.sidebar.text("Choose display options:")
@@ -58,61 +57,29 @@ def dashboard():
 
     st.sidebar.markdown("---")
 
-    # show_newspapers = {"Reuters": True, "Financial Times": True}
-    # for newspaper, value in show_newspapers.items():
-    #     checkbox_show_newspapers = st.sidebar.checkbox(label=newspaper, value=value)
-    #     if checkbox_show_newspapers:
-    #         show_newspapers[newspaper] = True
-    #     else:
-    #         show_newspapers[newspaper] = False
-
-    df = DatasetBuilder(stg.OUTPUT_FILENAME, stg.OUTPUTS_DIR).data
-
-    df["month"] = pd.DatetimeIndex(df["date"]).month
-
-    df.loc[df["label"] == "negative", "sentiment"] = -1
-    df.loc[df["label"] == "neutral", "sentiment"] = 0
-    df.loc[df["label"] == "positive", "sentiment"] = 1
+    # df = load_data_app()
 
     if display_option == "Tendencies":
         pass
 
     elif display_option == "Newspapers":
 
-        newspaper_option = st.select_slider(
+        col1, _, col2 = st.beta_columns([2, 1, 4])
+        start_date = str(col1.date_input("Start date", datetime.date(2020, 3, 1)))
+        end_date = str(col1.date_input("End date", datetime.date(2020, 11, 30)))
+
+        newspaper = col2.select_slider(
             label="Which newspaper do you want to include?",
             options=["Reuters", "Both", "Financial Times"],
             value=(("Both")),
         )
 
-        col1, col2 = st.beta_columns(2)
-        start_date = col1.date_input("Start date", datetime.date(2020, 3, 1))
-        end_date = col2.date_input("End date", datetime.date(2020, 11, 30))
-
-        # smooth = st.slider("Smooth curve", min_value=0, max_value=100)
-        smooth = st.select_slider(
-            label="Smooth curve", options=["Day", "Week", "Month", "Year"], value=(("Week"))
+        smooth = col2.select_slider(
+            label="Smooth curve", options=["Day", "Week", "Month"], value=(("Week"))
         )
         st.text("")
 
-        pivot = df.pivot_table(values="sentiment", index="source", columns="date", aggfunc=np.mean)
-
-        fig, ax = plt.subplots()
-        sns.lineplot(data=pivot.T, palette="tab10", linewidth=1)
-        plt.title("Daily sentiment")
-        ax.xaxis.set_major_locator(plt.MaxNLocator(15))
-        ax.set_ylim(-1, 1)
-        plt.xticks(rotation=90)
-        st.pyplot(fig)
-
-        pivot_month = df.pivot_table(
-            values="sentiment", index="source", columns="month", aggfunc=np.mean
-        )
-
-        fig, ax = plt.subplots()
-        sns.lineplot(data=pivot_month.T, palette="tab10", linewidth=1)
-        plt.title("Monthly sentiment")
-        ax.set_ylim(-0.4, 0.4)
+        fig = newspapers_plot(start_date, end_date, newspaper, smooth)
         st.pyplot(fig)
 
     elif display_option == "Raw data":
