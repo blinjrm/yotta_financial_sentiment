@@ -76,3 +76,25 @@ PARAMS_FT = {
     "html_headline": ["a", "js-teaser-heading-link"],
     "html_date": ["time", "o-date o-teaser__timestamp"],
 }
+
+PROJECT_DESCRIPTION = """ 
+2020 felt like a rollercoaster 🎢, with the global pandemic causing a sudden economic downturn 📉, which didn't prevent the stock market to rise to new heights ⛰️
+---
+We were curious about how financial newspapers have been dealing with this dichotomy, and decided to conduct an analysis of the sentiment of the headlines they printed throughout the year. 
+
+By leveraging recent advancements of *transfer learning* in the field of natural language processing, we can take a model pretrained on a large, generic language corpus (think Wikipedia), and fine-tune it on a domain-specific task: in our case classification of financial sentences. 
+
+For this project, we focused on the United States, being the first economy in the world and home to the largest financial markets, while at the same time being themost affected by the pandemic in terms of total cases and deaths. 
+
+This website presents in a **dashboard** the results of our analysis, regarding:
+* The evolution of the sentiment expressed in financial headlines throughout 2020
+* The relation between that sentiment and:
+    * The stock market
+    * The development of the COVID-19 pandemic
+
+It also provides you with the opportunity to use the models we fine-tuned on the **headlines** of your choice.  
+
+Finaly, we compare provide some insights into the **performance** of several language models. 
+
+*👈 Use the menu on the left to access these screens.*
+"""

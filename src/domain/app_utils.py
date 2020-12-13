@@ -123,9 +123,3 @@ def tendency_plot():
     )
 
     return fig
-
-
-if __name__ == "__main__":
-
-    data = tendency_data()
-    print(data)
