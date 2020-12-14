@@ -25,7 +25,7 @@ import src.settings.base as stg
 
 
 class DatasetBuilder:
-    """Creates dataet from CSV file.
+    """Creates dataset from CSV file.
 
     Args:
         filename (string): the name of the file to load - must be of type .csv.
