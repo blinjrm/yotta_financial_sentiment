@@ -8,7 +8,8 @@ TrainedModelLoader
 
 Functions
 -------
-
+tensorflowGPU
+torchGPU
 
 """
 
