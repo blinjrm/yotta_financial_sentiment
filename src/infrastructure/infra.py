@@ -6,6 +6,10 @@ DatasetBuilder
 ModelLoader
 TrainedModelLoader
 
+Functions
+-------
+
+
 """
 
 
@@ -13,6 +17,9 @@ import logging
 import os
 import re
 from datetime import date
+
+import tensorflow as tf
+import torch
 
 import pandas as pd
 import requests
@@ -145,3 +152,12 @@ class HeadlinesReuters:
         return pd.DataFrame(headlines)
 
 
+def tensorflowGPU():
+    # Get the GPU device name.
+    device_name = tf.test.gpu_device_name()
+
+    # The device name should look like the following:
+    if device_name == "/device:GPU:0":
+        print("Found GPU at: {}".format(device_name))
+    else:
+        raise SystemError("GPU device not found")  #
