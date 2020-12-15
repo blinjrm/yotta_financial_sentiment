@@ -90,9 +90,10 @@ def tendency_data():
     sentiment = load_data_app()
     sentiment = (
         sentiment.drop(columns=["headline", "label", "score", "source", "month", "week"])
-        .groupby("date")
+        .groupby("date", as_index=False)
         .mean()
     )
+    sentiment["week"] = pd.DatetimeIndex(sentiment["date"]).strftime("%W")
 
     stock = pd.read_csv("".join((stg.APP_DATA_DIR, "stock_sp500.csv")))
     stock = (
@@ -101,13 +102,15 @@ def tendency_data():
         .rename(columns={"Close": "S&P500"})
     )
 
-    data = sentiment.join(stock, how="left")
+    data = sentiment.join(stock, on="date", how="left")
+    data = data.drop(columns=["date"]).groupby("week", as_index=False).mean()
 
     return data
 
 
 def tendency_plot():
     data = tendency_data()
+    data = data.set_index("week")
 
     min_max_scaler = MinMaxScaler()
     data_scaled = min_max_scaler.fit_transform(data)
@@ -119,8 +122,24 @@ def tendency_plot():
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
     plt.legend(bbox_to_anchor=(1.01, 1), borderaxespad=0)
-    plt.title(
-        "Evolution of daily financial sentiment, S&P500 index \nand trading volume (normalized)"
+
+    return fig
+
+
+def tendency_heatmap():
+    data = tendency_data()
+    data = data.set_index("week")
+    corr = data.corr()
+
+    fig, ax = plt.subplots()
+    ax = sns.heatmap(
+        corr,
+        vmin=-1,
+        vmax=1,
+        center=0,
+        square=True,
+        annot=True,
+        cmap=sns.diverging_palette(220, 10, as_cmap=True),
     )
 
     return fig

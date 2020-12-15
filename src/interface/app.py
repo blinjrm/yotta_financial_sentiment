@@ -7,7 +7,13 @@ import streamlit as st
 
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
-from src.domain.app_utils import latest_news_widget, newspapers_plot, raw_data_plot, tendency_plot
+from src.domain.app_utils import (
+    latest_news_widget,
+    newspapers_plot,
+    raw_data_plot,
+    tendency_plot,
+    tendency_heatmap,
+)
 from src.domain.predict_utils import list_trained_models
 from src.infrastructure.infra import WebScraper
 
@@ -69,8 +75,16 @@ def dashboard():
 
     if display_option == "Tendencies":
         st.text("")
+        st.header(
+            "Evolution of weekly financial sentiment, S&P500 index and trading volume (normalized)"
+        )
         fig = tendency_plot()
         st.pyplot(fig)
+
+        st.text("")
+        st.header("Correlation between weekly financial sentiment, S&P500 index and trading volume")
+        heatmap = tendency_heatmap()
+        st.pyplot(heatmap)
 
     elif display_option == "Newspapers":
 
