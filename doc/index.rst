@@ -11,9 +11,4 @@ Welcome to financial_sentiment's documentation!
 
 
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
