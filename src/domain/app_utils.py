@@ -1,12 +1,13 @@
-import pandas as pd
-import numpy as np
-import streamlit as st
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
+import streamlit as st
 from sklearn.preprocessing import MinMaxScaler
 
 import src.settings.base as stg
-from src.infrastructure.infra import DatasetBuilder
+from src.application.predict_string import make_prediction_string
+from src.infrastructure.infra import DatasetBuilder, WebScraper
 
 
 @st.cache()
@@ -123,3 +124,18 @@ def tendency_plot():
     )
 
     return fig
+
+
+def latest_news_widget(PARAMS):
+    scraper = WebScraper(**PARAMS)
+    latest_headline = scraper.get_headlines().iloc[0, 0]
+
+    st.text("")
+    st.header(scraper.newspaper)
+    st.markdown("**" + latest_headline + "**")
+    with st.spinner("Analyzing..."):
+        prediction = make_prediction_string(latest_headline, model_name="distilroberta-base")
+
+    st.text("\nSentiment analysis:")
+    st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
+    st.text("")

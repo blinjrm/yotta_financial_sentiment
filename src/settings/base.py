@@ -84,7 +84,7 @@ We were curious about how financial newspapers have been dealing with this dicho
 
 By leveraging recent advancements of *transfer learning* in the field of natural language processing, we can take a model pretrained on a large, generic language corpus (think Wikipedia), and fine-tune it on a domain-specific task: in our case classification of financial sentences. 
 
-For this project, we focused on the United States, being the first economy in the world and home to the largest financial markets, while at the same time being themost affected by the pandemic in terms of total cases and deaths. 
+For this project, we focused on the United States, being the first economy in the world and home to the largest financial markets, while at the same time being the most affected by the pandemic in terms of total cases and deaths. 
 
 This website presents in a **dashboard** the results of our analysis, regarding:
 * The evolution of the sentiment expressed in financial headlines throughout 2020

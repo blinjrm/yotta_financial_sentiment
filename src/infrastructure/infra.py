@@ -158,7 +158,7 @@ class WebScraper:
 
                     print(f"Current page:{i}, current date: {date_clean}", end="\r")
 
-                    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", headline).strip()
+                    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", " ", headline).strip()
                     date_clean = parse(date_).strftime("%Y-%m-%d")
 
                     if date_clean < self.early_date:

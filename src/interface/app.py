@@ -1,14 +1,15 @@
+import datetime
 import logging
 import os
 
 import pandas as pd
 import streamlit as st
-import datetime
 
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
+from src.domain.app_utils import latest_news_widget, newspapers_plot, raw_data_plot, tendency_plot
 from src.domain.predict_utils import list_trained_models
-from src.domain.app_utils import newspapers_plot, raw_data_plot, tendency_plot
+from src.infrastructure.infra import WebScraper
 
 
 def project_description():
@@ -16,6 +17,19 @@ def project_description():
     st.title("Sentiment analysis of financial headlines")
     st.text("")
     st.markdown(stg.PROJECT_DESCRIPTION)
+
+
+def latest_headlines():
+    st.title("Latest headlines")
+    st.text("")
+
+    today = str(datetime.date.today())
+
+    stg.PARAMS_REUTERS["early_date"] = today
+    latest_news_widget(stg.PARAMS_REUTERS)
+
+    stg.PARAMS_FT["early_date"] = today
+    latest_news_widget(stg.PARAMS_FT)
 
 
 def single_sentence():
@@ -31,7 +45,9 @@ def single_sentence():
 
     sentence = st.text_input(label="Type your sentence here:")
 
-    if len(sentence) > 1:
+    make_pred = st.button("Start analysis")
+
+    if make_pred:
         with st.spinner("Analyzing..."):
             prediction = make_prediction_string(sentence, model_name=model)
 
@@ -112,6 +128,7 @@ def main():
         "I want to...",
         [
             "",
+            "see latest headlines",
             "view the dashboard",
             "analyze a single headline",
             "compare model performance",
@@ -123,6 +140,8 @@ def main():
 
     if option == "":
         project_description()
+    elif option == "see latest headlines":
+        latest_headlines()
     elif option == "view the dashboard":
         dashboard()
     elif option == "analyze a single headline":
