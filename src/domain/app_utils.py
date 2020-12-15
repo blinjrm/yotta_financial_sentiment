@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 from sklearn.preprocessing import MinMaxScaler
+from dateutil.parser import parse
 
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
@@ -102,10 +103,20 @@ def tendency_data():
         .rename(columns={"Close": "S&P500"})
     )
 
-    data = sentiment.join(stock, on="date", how="left")
-    data = data.drop(columns=["date"]).groupby("week", as_index=False).mean()
+    covid = pd.read_csv("".join((stg.APP_DATA_DIR, "us_covid.csv")), sep=";")
+    covid["date"] = covid["submission_date"].apply(lambda x: parse(x).strftime("%Y-%m-%d"))
+    covid = (
+        covid.groupby("date", as_index=False)
+        .sum()
+        .set_index("date")
+        .rename(columns={"new_case": "New cases", "new_death": "New deaths"})
+    )
 
-    return data
+    data = sentiment.join(stock, on="date", how="left")
+    data_with_covid = data.join(covid, on="date", how="left")
+    data_with_covid = data_with_covid.drop(columns=["date"]).groupby("week", as_index=False).mean()
+
+    return data_with_covid
 
 
 def tendency_plot():
@@ -131,16 +142,15 @@ def tendency_heatmap():
     data = data.set_index("week")
     corr = data.corr()
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8, 4))
     ax = sns.heatmap(
         corr,
         vmin=-1,
         vmax=1,
-        center=0,
-        square=True,
         annot=True,
-        cmap=sns.diverging_palette(220, 10, as_cmap=True),
+        cmap=sns.color_palette("vlag", as_cmap=True),
     )
+    plt.yticks(va="center")
 
     return fig
 
@@ -158,3 +168,7 @@ def latest_news_widget(PARAMS):
     st.text("\nSentiment analysis:")
     st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
     st.text("")
+
+
+if __name__ == "__main__":
+    data = tendency_data()
