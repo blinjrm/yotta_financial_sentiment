@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import streamlit as st
-from sklearn.preprocessing import MinMaxScaler
 from dateutil.parser import parse
+from sklearn.preprocessing import MinMaxScaler
 
 import src.settings.base as stg
 from src.application.predict_string import make_prediction_string
@@ -13,6 +13,11 @@ from src.infrastructure.infra import DatasetBuilder, WebScraper
 
 @st.cache()
 def load_data_app():
+    """Loads the output data of the prediction pipeline in a DataFrame
+
+    Returns:
+        df (DataFrame): headlines that were scraped with sentiment analysis
+    """
 
     df = DatasetBuilder(stg.OUTPUT_FILENAME, stg.OUTPUTS_DIR).data
 
@@ -28,6 +33,17 @@ def load_data_app():
 
 @st.cache()
 def newspapers_data(start_date, end_date, newspaper, smooth):
+    """[summary]
+
+    Args:
+        start_date (str): date for the beginning of the graphs
+        end_date (str): date for the end of the graphs
+        newspaper (str): newspaper to includ in the graph
+        smooth (str): granularity of the data
+
+    Returns:
+        pivot (DataFrame): pivot table
+    """
 
     df = load_data_app()
     df_with_dates = df[(df["date"] >= start_date) & (df["date"] <= end_date)]
@@ -47,6 +63,18 @@ def newspapers_data(start_date, end_date, newspaper, smooth):
 
 
 def newspapers_plot(start_date, end_date, newspaper, smooth):
+    """Plots the graph of the sentiment analysis for the selected newspapers
+    and between the selected dates.
+
+    Args:
+        start_date (str): date for the beginning of the graphs
+        end_date (str): date for the end of the graphs
+        newspaper (str): newspaper to includ in the graph
+        smooth (str): granularity of the data
+
+    Returns:
+        fig: matplotlib figure containing the tendency for the selected newspaper(s)
+    """
 
     df = newspapers_data(start_date, end_date, newspaper, smooth)
 
@@ -68,6 +96,12 @@ def newspapers_plot(start_date, end_date, newspaper, smooth):
 
 
 def raw_data_plot():
+    """Load headlines with prediction and plots the repartition per label.
+
+    Returns:
+        df (DataFrame): headlines with predictions
+        fig : matplotlib figure containing the number of headlines per label
+    """
 
     df = load_data_app()
 
@@ -88,6 +122,13 @@ def raw_data_plot():
 
 
 def tendency_data():
+    """Create a dataset containing the headlines with predictions, the data about the stock market
+    and the data about the covid cases.
+
+    Returns:
+        data_with_covid (DataFrame): weekly data about sentiment, stock market and new covid cases
+    """
+
     sentiment = load_data_app()
     sentiment = (
         sentiment.drop(columns=["headline", "label", "score", "source", "month", "week"])
@@ -121,6 +162,12 @@ def tendency_data():
 
 
 def tendency_plot():
+    """Plots the graphs for the sentiment, stock market and covid cases
+
+    Returns:
+        fig: matplotlib figure containing graphs for the sentiment, stock market and covid cases
+    """
+
     data = tendency_data()
     data = data.set_index("week")
 
@@ -139,6 +186,12 @@ def tendency_plot():
 
 
 def tendency_heatmap():
+    """Plot the correlations between headlines sentiment, stock market and new covid cases
+
+    Returns:
+        fig: matplotlib figure containing a heatmap
+    """
+
     data = tendency_data()
     data = data.set_index("week")
     corr = data.corr()
@@ -157,6 +210,12 @@ def tendency_heatmap():
 
 
 def latest_news_widget(PARAMS):
+    """Streamlit widget showing the latest headlines with sentiment analysis
+
+    Args:
+        PARAMS (dict): parameters to pass to the scraper class and get the latest headlines
+    """
+
     scraper = WebScraper(**PARAMS)
     latest_headline = scraper.get_headlines().iloc[0, 0]
 
@@ -169,7 +228,3 @@ def latest_news_widget(PARAMS):
     st.text("\nSentiment analysis:")
     st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
     st.text("")
-
-
-if __name__ == "__main__":
-    data = tendency_data()

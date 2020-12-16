@@ -11,8 +11,8 @@ from src.domain.app_utils import (
     latest_news_widget,
     newspapers_plot,
     raw_data_plot,
-    tendency_plot,
     tendency_heatmap,
+    tendency_plot,
 )
 from src.domain.predict_utils import list_trained_models
 from src.infrastructure.infra import WebScraper

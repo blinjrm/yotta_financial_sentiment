@@ -78,7 +78,7 @@ PARAMS_FT = {
 }
 
 PROJECT_DESCRIPTION = """ 
-2020 felt like a rollercoaster 🎢, with the global pandemic causing a sudden economic downturn 📉, which didn't prevent the stock market to rise to new heights ⛰️
+2020 felt like a rollercoaster 🎢, with the global pandemic causing a sudden economic downturn 📉, which didn't prevent the stock market to rise to new heights ⛰️.
 ---
 We were curious about how financial newspapers have been dealing with this dichotomy, and decided to conduct an analysis of the sentiment of the headlines they printed throughout the year. 
 
