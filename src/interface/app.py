@@ -19,6 +19,7 @@ from src.infrastructure.infra import WebScraper
 
 
 def project_description():
+    """Streamlit widget to show the project description on the home page."""
 
     st.title("Sentiment analysis of financial headlines")
     st.text("")
@@ -26,6 +27,9 @@ def project_description():
 
 
 def latest_headlines():
+    """Streamlit widget to show the latest headline from Reuters and Financial Times
+    with sentiment analysis.
+    """
     st.title("Latest headlines")
     st.text("")
 
@@ -41,6 +45,7 @@ def latest_headlines():
 
 
 def single_sentence():
+    """Streamlit widget to show the sentiment analysis of a headline typed by the user."""
 
     st.title("Sentiment analysis on a headline")
     st.text("")
@@ -66,6 +71,11 @@ def single_sentence():
 
 
 def dashboard():
+    """Streamlit widget showing a dashboard for the project, with the following pages:
+    - Tendencies: graph and correlation heatmap of fiancial sentiement, stock market and new covid cases
+    - Newspapers: graph showing the evolution of financilal sentiment for each newspaper
+    - Raw data: insight in the raw data (scraped headlines) used for the project
+    """
 
     st.title("Financial sentiment in the USA in 2020")
     st.text("")
@@ -129,6 +139,7 @@ def model_performance():
 
 
 def main():
+    """Homepage for the Streamlit app, redirects to appropriate function based on user selection."""
 
     st.set_page_config(
         page_title="Financial Sentiment",
@@ -167,7 +178,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
+    stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
 
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     main()
