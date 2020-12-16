@@ -33,9 +33,11 @@ def latest_headlines():
 
     stg.PARAMS_REUTERS["early_date"] = today
     latest_news_widget(stg.PARAMS_REUTERS)
+    st.markdown("---")
 
     stg.PARAMS_FT["early_date"] = today
     latest_news_widget(stg.PARAMS_FT)
+    st.markdown("---")
 
 
 def single_sentence():
