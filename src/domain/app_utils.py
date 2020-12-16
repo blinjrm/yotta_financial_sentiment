@@ -109,7 +109,8 @@ def tendency_data():
         covid.groupby("date", as_index=False)
         .sum()
         .set_index("date")
-        .rename(columns={"new_case": "New cases", "new_death": "New deaths"})
+        .drop(columns=["new_death"])
+        .rename(columns={"new_case": "New COVID cases"})
     )
 
     data = sentiment.join(stock, on="date", how="left")
@@ -128,7 +129,7 @@ def tendency_plot():
     df = pd.DataFrame(data_scaled, columns=data.columns)
 
     fig, ax = plt.subplots()
-    sns.lineplot(data=df, palette="Accent", linewidth=1)
+    sns.lineplot(data=df, palette="vlag", linewidth=1.5)
     sns.despine()
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
