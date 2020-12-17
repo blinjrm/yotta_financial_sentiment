@@ -74,7 +74,7 @@ Financial_sentiment's documentation
    | You sould always use this command when working on the project in a new session.
 
 ==============================
-3. Train (fine-tune) the model
+3. *Train (fine-tune) the model*
 ==============================
 
 * The raw data to train the model on must be in the data/training/ directory
@@ -111,7 +111,7 @@ Financial_sentiment's documentation
 * The trained model, tokenizer and config will be saved in the model/ directory.
 
 ================================
-4. Use the model for predictions
+4. *Use the model for predictions*
 ================================
 
 * The data used for prediction must be in the data/prediction/ directory
@@ -131,7 +131,7 @@ Financial_sentiment's documentation
    >>> run src/application/predict.py data_4_prediction.csv
 
 ================================================
-5. Test the model on a single sentiment analysis
+5. *Test the model on a single sentiment analysis*
 ================================================
 
 You can also test the model by classifiying a single sentence
