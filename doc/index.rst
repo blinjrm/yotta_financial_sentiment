@@ -8,6 +8,11 @@ Welcome to financial_sentiment's documentation!
 
 .. toctree::
    :maxdepth: 2
+   : caption: Contents:
+
+   sample_doc.rst
+   mardown_doc.md
+   notebook.ipynb
 
 
 
