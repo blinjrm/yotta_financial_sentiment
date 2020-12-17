@@ -127,17 +127,6 @@ def dashboard():
         st.pyplot(fig)
 
 
-def model_performance():
-
-    st.title("Model performance")
-    st.text("")
-
-    trained_models = list_trained_models()
-    model = st.sidebar.radio("Choose a model:", (trained_models))
-    st.sidebar.markdown("---")
-    st.header(f"Showing {model}")
-
-
 def main():
     """Homepage for the Streamlit app, redirects to appropriate function based on user selection."""
 
@@ -158,7 +147,6 @@ def main():
             "see latest headlines",
             "view the dashboard",
             "analyze a single headline",
-            "compare model performance",
         ],
     )
 
