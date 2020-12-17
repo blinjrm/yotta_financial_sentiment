@@ -3,8 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to financial_sentiment's documentation!
+Financial_sentiment's documentation
 ===============================================
+
+.. warning::
+
+   Work in progress!
+
+
+financial_sentiment
+
+Projet N°2 - Deep Learning
+
+Sujet : Sentiment analysis of financial news headlines
+
+Copyright : 2020, Damien Mellot & Jerome Blin
 
 .. toctree::
    :maxdepth: 2
