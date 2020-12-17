@@ -84,17 +84,12 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Financial_sentiment’s documentation</a></li>
-<li><a class="reference internal" href="#header-1">Header 1</a><ul>
-<li><a class="reference internal" href="#header-2">Header 2</a><ul>
-<li><a class="reference internal" href="#header-3">Header 3</a><ul>
-<li><a class="reference internal" href="#header-4">Header 4</a><ul>
-<li><a class="reference internal" href="#header-5">Header 5</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#installation">0. <strong>Installation</strong></a><ul>
+<li><a class="reference internal" href="#clone-this-repository">1) <em>Clone this repository</em></a></li>
+<li><a class="reference internal" href="#setup-your-environment">2) <em>Setup your environment</em></a></li>
+<li><a class="reference internal" href="#train-fine-tune-the-model">3. Train (fine-tune) the model</a></li>
+<li><a class="reference internal" href="#use-the-model-for-predictions">4. Use the model for predictions</a></li>
+<li><a class="reference internal" href="#test-the-model-on-a-single-sentiment-analysis">5. Test the model on a single sentiment analysis</a></li>
 </ul>
 </li>
 </ul>
@@ -191,60 +186,136 @@
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Work in progress!!!!!!</p>
-<p><em>Release December 21th 2020</em></p>
+<p><em>Release December 21st 2020</em></p>
 <p><strong>Yotta Academy</strong></p>
-<ul class="simple">
-<li><p>“Code is Law”</p></li>
-<li><dl class="simple">
-<dt>“Didn’t you knew that?</dt><dd><ol class="arabic simple">
-<li><p>Maybe</p></li>
-</ol>
-</dd>
-</dl>
-</li>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>0. <strong>Installation</strong><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="clone-this-repository">
+<h2>1) <em>Clone this repository</em><a class="headerlink" href="#clone-this-repository" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone &lt;this project&gt;
+$ <span class="nb">cd</span> &lt;this project&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="setup-your-environment">
+<h2>2) <em>Setup your environment</em><a class="headerlink" href="#setup-your-environment" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Goal :</div>
+<div class="line">Add the directory to the PYTHONPATH</div>
+<div class="line">Install the dependencies (if some are missing)</div>
+<div class="line">Create a local virtual environment in the folder <code class="docutils literal notranslate"><span class="pre">./.venv/</span></code> (if it does not exist already)</div>
+<div class="line">Activate the virtual environment</div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p>First: check your python3 version:</p></li>
 </ul>
-<ol class="arabic simple">
-<li><p>Yes I did.</p></li>
-<li><p>No I didn’t.</p></li>
-</ol>
-<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">best_package_of_all_times</span></code></p>
-</div>
-</div>
-<div class="section" id="header-1">
-<h1>Header 1<a class="headerlink" href="#header-1" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="header-2">
-<h2>Header 2<a class="headerlink" href="#header-2" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="header-3">
-<h3>Header 3<a class="headerlink" href="#header-3" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="header-4">
-<h4>Header 4<a class="headerlink" href="#header-4" title="Permalink to this headline">¶</a></h4>
-<div class="section" id="header-5">
-<h5>Header 5<a class="headerlink" href="#header-5" title="Permalink to this headline">¶</a></h5>
-<p>code sample:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_load_data_from_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_file_extension</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-         <span class="k">return</span> <span class="n">df</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 --version
+<span class="c1"># examples of outputs:</span>
+Python <span class="m">3</span>.6.2 :: Anaconda, Inc.
+Python <span class="m">3</span>.7.2
+
+$ which python3
+/Users/benjamin/anaconda3/bin/python3
+/usr/bin/python3
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_check_file_extension</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Confirm file extension is .csv&quot;</span><span class="p">)</span>
-     <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
-         <span class="k">return</span> <span class="kc">True</span>
-     <span class="k">else</span><span class="p">:</span>
-         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Extension must be .csv&quot;</span><span class="p">)</span>
-         <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="s2">&quot;Extension must be .csv&quot;</span><span class="p">)</span>
+<p>If you don’t have python3 and you are working on your mac: install it from <a class="reference external" href="http://python.org">http://python.org</a></p>
+<p>If you don’t have python3 and are working on an ubuntu-like system: install from package manager:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ apt-get update
+
+$ apt-get -y install python3 python3-pip python3-venv
 </pre></div>
 </div>
-<p>useful</p>
-<p>Projet N°2 - Deep Learning</p>
-<p>Sujet : Sentiment analysis of financial news headlines</p>
-<p>Copyright : 2020, Damien Mellot &amp; Jerome Blin</p>
-<p><code class="docutils literal notranslate"><span class="pre">Tout</span> <span class="pre">le</span> <span class="pre">monde</span> <span class="pre">doit</span> <span class="pre">avoir</span> <span class="pre">accès</span> <span class="pre">aux</span> <span class="pre">meilleurs</span> <span class="pre">informations</span> <span class="pre">financières</span>
-<span class="pre">en</span> <span class="pre">un</span> <span class="pre">instant</span></code></p>
+<ul class="simple">
+<li><p>Now that python3 is installed create and configure your environment:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> activate.sh
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">This command will :</div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p>Add the project directory to your PYTHONPATH</p></li>
+<li><p>Install the requiered dependencies</p></li>
+<li><p>Create (if necessary) the virtual environment</p></li>
+<li><p>Activate the virtual environment</p></li>
+</ul>
+</div></blockquote>
+<div class="line-block">
+<div class="line">You sould always use this command when working on the project in a new session.</div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="train-fine-tune-the-model">
+<h2>3. Train (fine-tune) the model<a class="headerlink" href="#train-fine-tune-the-model" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The raw data to train the model on must be in the data/training/ directory</p></li>
+<li><p>Run the training script using :</p></li>
+</ul>
+<p><em>from the shell :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python src/domain/train.py training_data.csv
+$ python src/domain/train.py training_data.csv --epochs<span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<p><em>from a python interpreter :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; run src/domain/train.py training_data.csv
+&gt;&gt;&gt; run src/domain/train.py training_data.csv --epochs<span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">Note that you must pass the filename containing the training data as an argument. The file must be of type .csv.</div>
+<div class="line">The optinal argument you can pass are :</div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p>filename (string): File containing the data - must be of type csv.</p></li>
+<li><p>path (string, optional): Path where filename is located. Defaults to stg.TRAINING_DATA_DIR.</p></li>
+<li><p>headline_col (string, optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.</p></li>
+<li><p>sentiment_col (string, optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.</p></li>
+<li><p>epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>The trained model, tokenizer and config will be saved in the model/ directory.</p></li>
+</ul>
+</div>
+<div class="section" id="use-the-model-for-predictions">
+<h2>4. Use the model for predictions<a class="headerlink" href="#use-the-model-for-predictions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The data used for prediction must be in the data/prediction/ directory</p></li>
+<li><p>Run the classification script using :</p></li>
+</ul>
+<p><em>from the shell :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python src/application/predict.py data_4_prediction.csv
+</pre></div>
+</div>
+<p><em>from a python interpreter :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; run src/application/predict.py data_4_prediction.csv
+</pre></div>
 </div>
 </div>
+<div class="section" id="test-the-model-on-a-single-sentiment-analysis">
+<h2>5. Test the model on a single sentiment analysis<a class="headerlink" href="#test-the-model-on-a-single-sentiment-analysis" title="Permalink to this headline">¶</a></h2>
+<p>You can also test the model by classifiying a single sentence</p>
+<ul class="simple">
+<li><p>Run the classification script using :</p></li>
+</ul>
+<p><em>from the shell :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python src/application/predict_string.py <span class="s2">&quot;After a violent crash, the stock doesn&#39;t seem to recover&quot;</span>
+</pre></div>
 </div>
+<p><em>from a python interpreter :</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;&gt; run src/application/predict_string.py <span class="s2">&quot;After a violent crash, the stock doesn&#39;t seem to recover&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>The label and score will be printed to the terminal.</p></li>
+</ul>
 </div>
 </div>
 
