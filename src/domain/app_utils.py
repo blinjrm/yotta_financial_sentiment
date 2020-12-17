@@ -121,6 +121,7 @@ def raw_data_plot():
     return df, fig
 
 
+@st.cache()
 def tendency_data():
     """Create a dataset containing the headlines with predictions, the data about the stock market
     and the data about the covid cases.
