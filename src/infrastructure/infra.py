@@ -9,7 +9,6 @@ WebScraper
 
 Functions
 -------
-tensorflowGPU
 torchGPU
 
 """
@@ -21,11 +20,10 @@ import re
 from dataclasses import dataclass
 from datetime import date
 
-import tensorflow as tf
-import torch
-
 import pandas as pd
 import requests
+import tensorflow as tf
+import torch
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
@@ -201,4 +199,3 @@ def torchGPU():
     else:
         print("No GPU available, using the CPU instead.")
         device = torch.device("cpu")
-
