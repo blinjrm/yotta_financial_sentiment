@@ -143,7 +143,7 @@ Activate the virtual environment
 *Alternatively, you can download the models we fine-tuned (RoBERTa-base and distilRoBERTa-base) from a cloud storage bucket, using the command:*
 
     ```
-    $ make init
+    $ make download_models
     ```
 *The two models will be downloaded to the model/ directory and can be used for financial sentiment classification.*
 
