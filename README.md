@@ -5,6 +5,7 @@ Sujet : Sentiment analysis of financial news headlines
 
 Copyright : 2020, Damien Mellot & Jerome Blin
 
+
 ___
 
 # Project Organization
@@ -15,17 +16,18 @@ ___
     ├── activate.sh                    <- Sript to configure the environment
     │                                     (PYTHONPATH, dependencies, virtual environment).
     ├── data
+    │   ├── app                        <- Folder containing the data used for the webapp.
     │   ├── training                   <- Folder containing the data for training the model.
     │   ├── prediction                 <- Folder containing the data to use for predictions.
     │   └── output                     <- Folder containing the output of the prediction script.
+    │
+    ├── docs                           <- Documentation for the project
     │
     ├── logs                           <- Folder containing the logs
     │
     ├── model                          <- Folder containing the trained model, to be used for predictions. 
     │
     ├── notebooks                      <- Jupyter notebooks.
-    │
-    ├── outputs                        <- Folder contraining the predictions of the model.
     │
     ├── poetry.lock                    <- Lock file to secure the version of dependencies.
     │
@@ -35,17 +37,21 @@ ___
         ├── __init__.py                <- Makes src a Python module.
         │
         ├── interface                  <- Scripts to create the webapp.
-        │   └── xxx.py
+        │   └── app.py
         │
         ├── application                <- Scripts to use the trained models to make predictions.
+        │   ├── train.py
         │   ├── predict_string.py
-        │   └── predict.py
+        │   ├── predict.py
+        │   └── scraping.py
         │
         ├── domain                     <- Sripts to fine-tune and save the model.
-        │   └── train.py
+        │   ├── app_utils.py
+        │   ├── predict_utils.py
+        │   └── train_utils.py
         │
         ├── infrastructure             <- Scripts to load the raw data in a Pandas DataFrame.
-        │   └── make_dataset.py
+        │   └── infra.py
         │
         └── settings                   <- Scripts containing the settings.
             └── base.py
@@ -107,7 +113,7 @@ Activate the virtual environment
 
 ## 3. Train (fine-tune) the model
 
-- The raw data to train the model on must be in the data/training/ directory
+- The labelled data to train the model on must be in the data/training/ directory
 - Run the training script using : 
 
     *from the shell :*
@@ -129,14 +135,32 @@ Activate the virtual environment
     - headline_col (string, optional): Name of the columns containing the headlines. Defaults to stg.HEADLINE_COL.  
     - sentiment_col (string, optional): Name of the columns containing the target (sentiment). Defaults to stg.SENTIMENT_COL.  
     - epochs (int, optional): Number of epochs for fine-tuning. Defaults to 5.  
-
+   
 - The trained model, tokenizer and config will be saved in the model/ directory. 
 
+## 4. Scrape new data
 
-## 4. Use the model for predictions
+Some headlines have already been scraped, covering a period from mars to novembre 2020. This data can be found under data/prediction/, since it will be passed to the model for sentiment analysis. 
+- If you want to scrape additional data, you can run the scraping srcipt using: 
+
+    *from the shell :*
+    ```
+    $ python src/application/scraping.py
+    $ python src/application/scraping.py --website="reuters" --early_date="2020-09-01"
+    ```
+
+    *from a python interpreter :*
+    ```
+    >>> run src/application/scraping.py
+    >>> run src/application/scraping.py --website="reuters" --early_date="2020-09-01"
+    ```
+
+- The file containing the predictions will be saved in the data/prediction/ directory as a csv file named *scraped_headlines.csv*  
+
+## 5. Use the model for predictions
 
 - The data used for prediction must be in the data/prediction/ directory
-- Run the classification script using : 
+- Run the classification script using: 
 
     *from the shell :*
     ```
@@ -151,10 +175,10 @@ Activate the virtual environment
 - The file containing the predictions will be saved in the data/outputs/ directory as a csv file named *data_with_predictions.csv*  
 
 
-## 5. Test the model on a single sentiment analysis
+## 6. Test the model on a single sentiment analysis
 
 You can also test the model by classifiying a single sentence   
-- Run the classification script using : 
+- Run the classification script using: 
 
     *from the shell :*
     ```
@@ -167,3 +191,16 @@ You can also test the model by classifiying a single sentence
     ```
 
 - The label and score will be printed to the terminal.  
+
+## 7. Launch the web app
+
+You can use our model and review our results using a web app. 
+- Launch the streamlit app using: 
+
+    *from the shell :*
+    ```
+    $ streamlit run src/interface/app.py
+    ```
+
+- Copy the url and open it in a web browser
+ 
