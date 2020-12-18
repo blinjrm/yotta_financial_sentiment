@@ -15,6 +15,7 @@ streamlit = "^0.72.0"
 pydeck = "^0.5.0"
 plotly-express = "^0.4.1"
 beautifulsoup4 = "^4.9.3"
+tensorflow = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
