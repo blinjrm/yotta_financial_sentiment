@@ -13,13 +13,15 @@ ___
 
     ├── README.md                      <- The top-level README for developers using this project.
     │
-    ├── activate.sh                    <- Sript to configure the environment
-    │                                     (PYTHONPATH, dependencies, virtual environment).
+    ├── activate.sh                    <- Configure the environment (PYTHONPATH, dependencies, virtual environment).
+    │
+    ├── download_models.sh             <- Configure the environment (PYTHONPATH, dependencies, virtual environment).
+    │
     ├── data
-    │   ├── app                        <- Folder containing the data used for the webapp.
-    │   ├── training                   <- Folder containing the data for training the model.
-    │   ├── prediction                 <- Folder containing the data to use for predictions.
-    │   └── output                     <- Folder containing the output of the prediction script.
+    │   ├── app                        <- Data used for the webapp.
+    │   ├── training                   <- Data for training the model.
+    │   ├── prediction                 <- Data to use for predictions.
+    │   └── output                     <- Output of the prediction script.
     │
     ├── docs                           <- Documentation for the project
     │
@@ -29,9 +31,9 @@ ___
     │
     ├── notebooks                      <- Jupyter notebooks.
     │
-    ├── poetry.lock                    <- Lock file to secure the version of dependencies.
-    │
     ├── pyproject.toml                 <- Poetry file with dependencies.
+    │
+    ├── Makefile                       <- Commands to launch scripts.
     │
     └── src                            <- Source code for use in this project.
         ├── __init__.py                <- Makes src a Python module.
