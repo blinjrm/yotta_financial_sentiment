@@ -7,6 +7,11 @@ ModelLoader
 TrainedModelLoader
 WebScraper
 
+Functions
+-------
+tensorflowGPU
+torchGPU
+
 """
 
 
@@ -15,6 +20,9 @@ import os
 import re
 from dataclasses import dataclass
 from datetime import date
+
+import tensorflow as tf
+import torch
 
 import pandas as pd
 import requests
@@ -26,7 +34,7 @@ import src.settings.base as stg
 
 
 class DatasetBuilder:
-    """Creates dataet from CSV file.
+    """Creates dataset from CSV file.
 
     Args:
         filename (string): the name of the file to load - must be of type .csv.
@@ -175,3 +183,22 @@ class WebScraper:
         df["source"] = self.newspaper
 
         return df
+
+
+def torchGPU():
+
+    # If there's a GPU available...
+    if torch.cuda.is_available():
+
+        # Tell PyTorch to use the GPU.
+        device = torch.device("cuda")
+
+        print("There are %d GPU(s) available." % torch.cuda.device_count())
+
+        print("We will use the GPU:", torch.cuda.get_device_name(0))
+
+    # If not...
+    else:
+        print("No GPU available, using the CPU instead.")
+        device = torch.device("cpu")
+
