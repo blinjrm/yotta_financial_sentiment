@@ -5,6 +5,7 @@ Classes
 DatasetBuilder
 ModelLoader
 TrainedModelLoader
+WebScraper
 
 Functions
 -------
@@ -17,6 +18,7 @@ torchGPU
 import logging
 import os
 import re
+from dataclasses import dataclass
 from datetime import date
 
 import tensorflow as tf
@@ -26,7 +28,6 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-from tqdm import tqdm
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
 import src.settings.base as stg
@@ -105,63 +106,83 @@ class TrainedModelLoader:
         self.model, self.tokenizer = self._load_model()
 
     def _load_model(self):
-        config = AutoConfig.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
-        tokenizer = AutoTokenizer.from_pretrained(os.path.join(stg.MODEL_DIR, stg.MODEL_NAME))
+        config = AutoConfig.from_pretrained(
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), local_files_only=True
+        )
+        tokenizer = AutoTokenizer.from_pretrained(
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), local_files_only=True
+        )
         model = AutoModelForSequenceClassification.from_pretrained(
-            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), config=config
+            os.path.join(stg.MODEL_DIR, stg.MODEL_NAME), config=config, local_files_only=True
         )
 
         return model, tokenizer
 
 
-class HeadlinesReuters:
-    """Web scraping from reuters.com"""
+@dataclass
+class WebScraper:
+    """Scrape headlines and publication dates from news websites"""
 
-    def __init__(self, edition, domain, n_pages):
-        self.edition = edition
-        self.domain = domain
-        self.n_pages = n_pages
-        self.data = self._get_data()
+    newspaper: str
+    early_date: str
+    url: str
+    html_articles: list
+    html_headline: list
+    html_date: list
 
-    def _get_data(self):
-        print(f"Getting headlines for {self.domain}")
+    def get_headlines(self):
+        """Get headlines and date of news articles.
 
-        headlines = {"headline": [], "date": [], "edition": []}
+        Returns:
+            df (DataFrame): DataFrame containing the headlines and data scraped, with the name of the website.
+        """
 
-        for i in tqdm(range(1, self.n_pages + 1)):
+        print(f"\nGetting headlines from {self.newspaper}:")
 
-            url = f"{self.domain}/news/archive/marketsNews?view=page&page={i}&pageSize=10"
+        headlines = {"headline": [], "date": []}
+        date_clean = date.today().strftime("%Y-%m-%d")
+        i = 1
+
+        while date_clean >= self.early_date:
+
+            url = self.url.format(i=i)
             response = requests.get(url)
             soup = BeautifulSoup(response.text, "html.parser")
-            articles = soup.findAll("div", class_="story-content")
+
+            try:
+                articles = soup.findAll(self.html_articles[0], class_=self.html_articles[1])
+            except:
+                break
+
+            if len(articles) < 3:
+                break
 
             for article in articles:
                 try:
-                    headline = article.find("h3", class_="story-title").text
-                    date = article.find("span", class_="timestamp").text
+                    headline = article.find(
+                        self.html_headline[0], class_=self.html_headline[1]
+                    ).text
+                    date_ = article.find(self.html_date[0], class_=self.html_date[1]).text
 
-                    headline_clean = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", headline).strip()
-                    date_clean = parse(date).strftime("%Y-%m-%d")
+                    print(f"Current page:{i}, current date: {date_clean}", end="\r")
+
+                    headline_clean = re.sub(r"[()\#/@;<>{}=~|.?]", " ", headline).strip()
+                    date_clean = parse(date_).strftime("%Y-%m-%d")
+
+                    if date_clean < self.early_date:
+                        break
 
                     headlines["headline"].append(headline_clean)
                     headlines["date"].append(date_clean)
-                    headlines["edition"].append(self.edition)
-
                 except:
                     pass
 
-        return pd.DataFrame(headlines)
+            i += 1
 
+        df = pd.DataFrame(headlines)
+        df["source"] = self.newspaper
 
-def tensorflowGPU():
-    # Get the GPU device name.
-    device_name = tf.test.gpu_device_name()
-
-    # The device name should look like the following:
-    if device_name == "/device:GPU:0":
-        print("Found GPU at: {}".format(device_name))
-    else:
-        raise SystemError("GPU device not found")  #
+        return df
 
 
 def torchGPU():
@@ -180,3 +201,4 @@ def torchGPU():
     else:
         print("No GPU available, using the CPU instead.")
         device = torch.device("cpu")
+

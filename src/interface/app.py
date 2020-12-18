@@ -1,80 +1,172 @@
+import datetime
 import logging
-import time
+import os
 
-import numpy as np
 import pandas as pd
-import pydeck
 import streamlit as st
 
 import src.settings.base as stg
-from src import make_prediction_string, plotly_map, pydeck_map
+from src.application.predict_string import make_prediction_string
+from src.domain.app_utils import (
+    latest_news_widget,
+    newspapers_plot,
+    raw_data_plot,
+    tendency_heatmap,
+    tendency_plot,
+)
+from src.domain.predict_utils import list_trained_models
+from src.infrastructure.infra import WebScraper
+
+
+def project_description():
+    """Streamlit widget to show the project description on the home page."""
+
+    st.title("Sentiment analysis of financial headlines")
+    st.text("")
+    st.markdown(stg.PROJECT_DESCRIPTION)
+
+
+def latest_headlines():
+    """Streamlit widget to show the latest headline from Reuters and Financial Times
+    with sentiment analysis.
+    """
+    st.title("Latest headlines")
+    st.text("")
+
+    today = str(datetime.date.today())
+
+    stg.PARAMS_REUTERS["early_date"] = today
+    latest_news_widget(stg.PARAMS_REUTERS)
+    st.markdown("---")
+
+    stg.PARAMS_FT["early_date"] = today
+    latest_news_widget(stg.PARAMS_FT)
+    st.markdown("---")
 
 
 def single_sentence():
+    """Streamlit widget to show the sentiment analysis of a headline typed by the user."""
 
-    sentence = st.text_input(label="Type a sentence for sentiment analysis:")
+    st.title("Sentiment analysis on a headline")
+    st.text("")
 
-    if len(sentence) > 1:
+    trained_models = list_trained_models()
+    trained_models.append("zero-shot-classifier")
+
+    model = st.sidebar.radio("Choose a model:", (trained_models))
+    st.sidebar.markdown("---")
+
+    sentence = st.text_input(label="Type your sentence here:")
+
+    make_pred = st.button("Start analysis")
+
+    if make_pred:
         with st.spinner("Analyzing..."):
-            prediction = make_prediction_string(sentence)
+            prediction = make_prediction_string(sentence, model_name=model)
 
         st.text("\nSentiment analysis:")
         st.text(f"Label: {prediction['label']}, with score: {round(prediction['score'], 4)}")
 
+    # TODO: add model description
 
-def list_headlines():
-    st.sidebar.text("")
-    st.sidebar.text("Which countries \ndo you want to include?")
 
-    show_country = {"USA": True, "UK": True, "China": True}
-    for country in show_country.keys():
-        checkbox_show_country = st.sidebar.checkbox(label=country, value=True)
-        if checkbox_show_country:
-            show_country[country] = True
-        else:
-            show_country[country] = False
+def dashboard():
+    """Streamlit widget showing a dashboard for the project, with the following pages:
+    - Tendencies: graph and correlation heatmap of fiancial sentiement, stock market and new covid cases
+    - Newspapers: graph showing the evolution of financilal sentiment for each newspaper
+    - Raw data: insight in the raw data (scraped headlines) used for the project
+    """
 
-    left_column, right_column = st.beta_columns(2)
-    bt1 = left_column.button("Show countries?")
-    if bt1:
-        right_column.write(show_country)
+    st.title("Financial sentiment in the USA in 2020")
+    st.text("")
 
-    bt2 = st.button("Show map")
-    if bt2:
-        r = pydeck_map()
-        r
-        # fig = plotly_map()
-        # st.text(fig.show())
+    st.sidebar.text("Choose display options:")
+    display_option = st.sidebar.radio(label="", options=["Tendencies", "Newspapers", "Raw data"])
+
+    st.sidebar.markdown("---")
+
+    if display_option == "Tendencies":
+        st.text("")
+        st.header(
+            "Evolution of weekly financial sentiment, S&P500 index and trading volume (normalized)"
+        )
+        fig = tendency_plot()
+        st.pyplot(fig)
+
+        st.text("")
+        st.header("Correlation between weekly financial sentiment, S&P500 index and trading volume")
+        heatmap = tendency_heatmap()
+        st.pyplot(heatmap)
+
+    elif display_option == "Newspapers":
+
+        col1, _, col2 = st.beta_columns([2, 1, 4])
+        start_date = str(col1.date_input("Start date", datetime.date(2020, 3, 1)))
+        end_date = str(col1.date_input("End date", datetime.date(2020, 11, 30)))
+
+        newspaper = col2.select_slider(
+            label="Which newspaper do you want to include?",
+            options=["Reuters", "Both", "Financial Times"],
+            value=(("Both")),
+        )
+
+        smooth = col2.select_slider(
+            label="Granularity", options=["Day", "Week", "Month"], value=(("Week"))
+        )
+        st.text("")
+
+        fig = newspapers_plot(start_date, end_date, newspaper, smooth)
+        st.pyplot(fig)
+
+    elif display_option == "Raw data":
+
+        df, fig = raw_data_plot()
+
+        st.text("")
+        st.text(df)
+        st.pyplot(fig)
 
 
 def main():
-    st.title("Sentiment analysis of financial headlines")
-    st.text("")
-    st.text("")
+    """Homepage for the Streamlit app, redirects to appropriate function based on user selection."""
 
-    expander = st.beta_expander("Project description")
-    expander.write(
-        "The goal of this project is to visualize the evolution of financial sentiment \
-        in the global market as reflected by the newspaper headlines. "
+    st.set_page_config(
+        page_title="Financial Sentiment",
+        page_icon="💵",
+        layout="centered",
+        initial_sidebar_state="auto",
     )
 
-    st.text(" ")
-    st.text(" ")
+    st.sidebar.text("")
+    st.sidebar.text("")
+
     option = st.sidebar.selectbox(
-        "I want to...", ["analyze a single sentence", "see the dashboard", "test model performance"]
+        "I want to...",
+        [
+            "",
+            "see latest headlines",
+            "view the dashboard",
+            "analyze a single headline",
+        ],
     )
-    "Currently enabling predictions for: ", option
 
     st.text(" ")
+    st.sidebar.markdown("---")
 
-    if option == "analyze a single sentence":
+    if option == "":
+        project_description()
+    elif option == "see latest headlines":
+        latest_headlines()
+    elif option == "view the dashboard":
+        dashboard()
+    elif option == "analyze a single headline":
         single_sentence()
-    else if option == "see the dashboard":
-        list_headlines()
     else:
-        pass
+        model_performance()
 
 
 if __name__ == "__main__":
     stg.enable_logging(log_filename="project_logs.log", logging_level=logging.INFO)
+
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
     main()
