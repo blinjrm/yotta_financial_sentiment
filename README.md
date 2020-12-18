@@ -20,6 +20,8 @@ ___
     │   ├── prediction                 <- Folder containing the data to use for predictions.
     │   └── output                     <- Folder containing the output of the prediction script.
     │
+    ├── docs                           <- Documentation for the project
+    │
     ├── logs                           <- Folder containing the logs
     │
     ├── model                          <- Folder containing the trained model, to be used for predictions. 
