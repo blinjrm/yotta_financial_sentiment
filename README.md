@@ -5,6 +5,7 @@ Sujet : Sentiment analysis of financial news headlines
 
 Copyright : 2020, Damien Mellot & Jerome Blin
 
+
 ___
 
 # Project Organization
